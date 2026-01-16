@@ -18,9 +18,20 @@ class CategoryModel extends Category {
           .toList();
     }
 
+    // Try to get Arabic name from multiple possible fields
+    String categoryName = '';
+    if (json['name_ar'] != null && json['name_ar'].toString().isNotEmpty) {
+      categoryName = json['name_ar'];
+    } else if (json['title_ar'] != null &&
+        json['title_ar'].toString().isNotEmpty) {
+      categoryName = json['title_ar'];
+    } else {
+      categoryName = json['name'] ?? '';
+    }
+
     return CategoryModel(
       id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      name: categoryName,
       image: json['image'],
       description: json['description'],
       count: json['count'] ?? 0,
@@ -52,8 +63,24 @@ class ProductModel extends Product {
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-    // Use Arabic name if available, fallback to regular name
-    String productName = json['name_ar'] ?? json['name'] ?? '';
+    // Try to get Arabic name from multiple possible fields
+    String productName = '';
+
+    // Check for Arabic name in various fields
+    if (json['name_ar'] != null && json['name_ar'].toString().isNotEmpty) {
+      productName = json['name_ar'];
+    } else if (json['title_ar'] != null &&
+        json['title_ar'].toString().isNotEmpty) {
+      productName = json['title_ar'];
+    } else if (json['name'] != null) {
+      // Check if name contains Arabic characters
+      String name = json['name'].toString();
+      if (name.contains(RegExp(r'[\u0600-\u06FF]'))) {
+        productName = name;
+      } else {
+        productName = name; // Fallback to any name
+      }
+    }
 
     return ProductModel(
       id: json['id'] ?? 0,

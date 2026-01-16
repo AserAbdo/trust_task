@@ -148,9 +148,9 @@ class ProductCard extends StatelessWidget {
                       Text(
                         l10n.translate('currency_symbol'),
                         style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: textGrey,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: textDark,
                         ),
                       ),
                     ],
