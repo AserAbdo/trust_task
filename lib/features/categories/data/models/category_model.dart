@@ -4,6 +4,7 @@ class CategoryModel extends Category {
   const CategoryModel({
     required super.id,
     required super.name,
+    super.nameEn,
     super.image,
     super.description,
     super.count,
@@ -18,20 +19,14 @@ class CategoryModel extends Category {
           .toList();
     }
 
-    // Try to get Arabic name from multiple possible fields
-    String categoryName = '';
-    if (json['name_ar'] != null && json['name_ar'].toString().isNotEmpty) {
-      categoryName = json['name_ar'];
-    } else if (json['title_ar'] != null &&
-        json['title_ar'].toString().isNotEmpty) {
-      categoryName = json['title_ar'];
-    } else {
-      categoryName = json['name'] ?? '';
-    }
+    // Get Arabic name (priority) and English name
+    String categoryName = json['name_ar'] ?? json['name'] ?? '';
+    String? categoryNameEn = json['name_en'];
 
     return CategoryModel(
       id: json['id'] ?? 0,
       name: categoryName,
+      nameEn: categoryNameEn,
       image: json['image'],
       description: json['description'],
       count: json['count'] ?? 0,
@@ -43,6 +38,7 @@ class CategoryModel extends Category {
     return {
       'id': id,
       'name': name,
+      'name_en': nameEn,
       'image': image,
       'description': description,
       'count': count,
@@ -54,43 +50,50 @@ class ProductModel extends Product {
   const ProductModel({
     required super.id,
     required super.name,
+    super.nameEn,
     super.description,
+    super.descriptionAr,
     super.image,
     required super.price,
+    super.priceTax,
     super.regularPrice,
     super.salePrice,
     super.onSale,
+    super.points,
+    super.totalSales,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
-    // Try to get Arabic name from multiple possible fields
-    String productName = '';
+    // Get Arabic name (priority)
+    String productName = json['name_ar'] ?? json['name'] ?? '';
+    String? productNameEn = json['name_en'];
 
-    // Check for Arabic name in various fields
-    if (json['name_ar'] != null && json['name_ar'].toString().isNotEmpty) {
-      productName = json['name_ar'];
-    } else if (json['title_ar'] != null &&
-        json['title_ar'].toString().isNotEmpty) {
-      productName = json['title_ar'];
-    } else if (json['name'] != null) {
-      // Check if name contains Arabic characters
-      String name = json['name'].toString();
-      if (name.contains(RegExp(r'[\u0600-\u06FF]'))) {
-        productName = name;
-      } else {
-        productName = name; // Fallback to any name
-      }
+    // Get Arabic description
+    String? descriptionAr = json['description_ar'];
+    String? descriptionEn = json['description_en'] ?? json['description'];
+
+    // Parse price_tax as integer
+    int? priceTax;
+    if (json['price_tax'] != null) {
+      priceTax = (json['price_tax'] is int)
+          ? json['price_tax']
+          : int.tryParse(json['price_tax'].toString());
     }
 
     return ProductModel(
       id: json['id'] ?? 0,
       name: productName,
-      description: json['description'] ?? json['short_description'] ?? '',
+      nameEn: productNameEn,
+      description: descriptionEn,
+      descriptionAr: descriptionAr,
       image: _extractImage(json),
       price: json['price']?.toString() ?? '0',
+      priceTax: priceTax,
       regularPrice: json['regular_price']?.toString(),
       salePrice: json['sale_price']?.toString(),
       onSale: json['on_sale'] ?? false,
+      points: json['points'] ?? 0,
+      totalSales: json['total_sales'] ?? 0,
     );
   }
 
@@ -110,12 +113,17 @@ class ProductModel extends Product {
     return {
       'id': id,
       'name': name,
+      'name_en': nameEn,
       'description': description,
+      'description_ar': descriptionAr,
       'image': image,
       'price': price,
+      'price_tax': priceTax,
       'regular_price': regularPrice,
       'sale_price': salePrice,
       'on_sale': onSale,
+      'points': points,
+      'total_sales': totalSales,
     };
   }
 }

@@ -20,18 +20,8 @@ class ProductDetailsRepositoryImpl implements ProductDetailsRepository {
       );
       final addons = await remoteDataSource.getProductAddons(productId);
 
-      final productWithAddons = ProductDetails(
-        id: productDetails.id,
-        name: productDetails.name,
-        description: productDetails.description,
-        shortDescription: productDetails.shortDescription,
-        price: productDetails.price,
-        regularPrice: productDetails.regularPrice,
-        salePrice: productDetails.salePrice,
-        onSale: productDetails.onSale,
-        images: productDetails.images,
-        addons: addons,
-      );
+      // Use copyWithAddons to combine product with addons
+      final productWithAddons = productDetails.copyWithAddons(addons);
 
       return Right(productWithAddons);
     } on ServerException catch (e) {

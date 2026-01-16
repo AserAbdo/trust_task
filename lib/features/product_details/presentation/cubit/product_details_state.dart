@@ -15,7 +15,7 @@ class ProductDetailsLoading extends ProductDetailsState {}
 class ProductDetailsLoaded extends ProductDetailsState {
   final ProductDetails product;
   final int quantity;
-  final Map<int, List<String>> selectedOptions;
+  final Map<String, List<String>> selectedOptions; // Changed to String key
   final double totalPrice;
 
   const ProductDetailsLoaded({
@@ -28,7 +28,7 @@ class ProductDetailsLoaded extends ProductDetailsState {
   ProductDetailsLoaded copyWith({
     ProductDetails? product,
     int? quantity,
-    Map<int, List<String>>? selectedOptions,
+    Map<String, List<String>>? selectedOptions,
     double? totalPrice,
   }) {
     return ProductDetailsLoaded(

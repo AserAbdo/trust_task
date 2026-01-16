@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations.dart';
@@ -125,12 +124,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
       headerText = category.name;
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Text(
             headerText,
             style: const TextStyle(
               fontSize: 20,
@@ -138,10 +138,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
               color: Color(0xFF000000), // Pure black
               letterSpacing: 0.3,
             ),
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
           ),
-        ],
+        ),
       ),
     );
   }
@@ -352,7 +350,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   Widget _buildCartFab() {
     const Color darkBrown = Color(0xFF412216);
-    const Color linenColor = Color(0xFFFAF0E6);
 
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
@@ -366,24 +363,28 @@ class _CategoriesPageState extends State<CategoriesPage> {
           child: GestureDetector(
             onTap: _navigateToCart,
             child: Container(
-              width: 85,
-              height: 85,
+              width: 90,
+              height: 90,
               decoration: BoxDecoration(
-                color: linenColor.withValues(alpha: 0.95),
+                color: Colors.transparent,
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: darkBrown.withValues(alpha: 0.15),
+                  width: 12,
+                ),
               ),
               child: Center(
                 child: Container(
-                  width: 60,
-                  height: 60,
+                  width: 58,
+                  height: 58,
                   decoration: BoxDecoration(
                     color: darkBrown,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: darkBrown.withValues(alpha: 0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                        color: darkBrown.withValues(alpha: 0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
@@ -392,27 +393,26 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     children: [
                       // Cart icon with smile
                       CustomPaint(
-                        size: const Size(28, 28),
+                        size: const Size(26, 26),
                         painter: _CartIconPainter(),
                       ),
                       if (itemCount > 0)
                         Positioned(
-                          top: 6,
-                          left: 6,
+                          top: 2,
+                          left: 2,
                           child: Container(
                             width: 18,
                             height: 18,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF8BC34A),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
                               shape: BoxShape.circle,
-                              border: Border.all(color: darkBrown, width: 2),
                             ),
                             child: Center(
                               child: Text(
                                 '$itemCount',
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
+                                  color: darkBrown,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -489,12 +489,65 @@ class _HomeIcon extends StatelessWidget {
     const Color darkBrown = Color(0xFF412216);
     const Color greyColor = Color(0xFF9B806E);
 
-    return Icon(
-      isSelected ? Icons.home_rounded : Icons.home_outlined,
-      color: isSelected ? darkBrown : greyColor,
-      size: 26,
+    // Advanced home icon with roof shape
+    return CustomPaint(
+      size: const Size(26, 26),
+      painter: _HomeIconPainter(
+        color: isSelected ? darkBrown : greyColor,
+        isSelected: isSelected,
+      ),
     );
   }
+}
+
+class _HomeIconPainter extends CustomPainter {
+  final Color color;
+  final bool isSelected;
+
+  _HomeIconPainter({required this.color, required this.isSelected});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = isSelected ? PaintingStyle.fill : PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    // Draw house shape
+    final path = Path();
+    // Roof
+    path.moveTo(size.width * 0.5, size.height * 0.1);
+    path.lineTo(size.width * 0.1, size.height * 0.45);
+    path.lineTo(size.width * 0.25, size.height * 0.45);
+    path.lineTo(size.width * 0.25, size.height * 0.9);
+    path.lineTo(size.width * 0.75, size.height * 0.9);
+    path.lineTo(size.width * 0.75, size.height * 0.45);
+    path.lineTo(size.width * 0.9, size.height * 0.45);
+    path.close();
+
+    canvas.drawPath(path, paint);
+
+    // Draw door
+    if (isSelected) {
+      final doorPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+      canvas.drawRect(
+        Rect.fromLTWH(
+          size.width * 0.4,
+          size.height * 0.55,
+          size.width * 0.2,
+          size.height * 0.35,
+        ),
+        doorPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _MenuIcon extends StatelessWidget {
@@ -514,14 +567,14 @@ class _MenuIcon extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(
-          Icons.auto_stories_rounded,
+          Icons.menu_book_rounded,
           color: Colors.white,
           size: 20,
         ),
       );
     }
 
-    return Icon(Icons.auto_stories_outlined, color: greyColor, size: 26);
+    return Icon(Icons.menu_book_outlined, color: greyColor, size: 26);
   }
 }
 
@@ -534,86 +587,13 @@ class _OffersIcon extends StatelessWidget {
     const Color darkBrown = Color(0xFF412216);
     const Color greyColor = Color(0xFF9B806E);
 
-    // Custom offers icon with percentage and gear style
-    return CustomPaint(
-      size: const Size(28, 28),
-      painter: _OffersIconPainter(color: isSelected ? darkBrown : greyColor),
+    // Discount/offers icon
+    return Icon(
+      isSelected ? Icons.local_offer : Icons.local_offer_outlined,
+      color: isSelected ? darkBrown : greyColor,
+      size: 26,
     );
   }
-}
-
-class _OffersIconPainter extends CustomPainter {
-  final Color color;
-
-  _OffersIconPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width * 0.30;
-
-    // Draw main circle
-    canvas.drawCircle(center, radius, paint);
-
-    // Draw gear teeth (8 teeth)
-    for (int i = 0; i < 8; i++) {
-      final angle = i * math.pi * 2 / 8;
-      final innerRadius = radius;
-      final outerRadius = radius + size.width * 0.10;
-
-      final x1 = center.dx + innerRadius * math.cos(angle);
-      final y1 = center.dy + innerRadius * math.sin(angle);
-      final x2 = center.dx + outerRadius * math.cos(angle);
-      final y2 = center.dy + outerRadius * math.sin(angle);
-
-      canvas.drawLine(
-        Offset(x1, y1),
-        Offset(x2, y2),
-        Paint()
-          ..color = color
-          ..strokeWidth = 2.5
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-
-    // Draw percentage symbol inside
-    final percentPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
-
-    // Draw slash
-    canvas.drawLine(
-      Offset(center.dx + radius * 0.35, center.dy - radius * 0.35),
-      Offset(center.dx - radius * 0.35, center.dy + radius * 0.35),
-      percentPaint,
-    );
-
-    // Draw two small circles for %
-    canvas.drawCircle(
-      Offset(center.dx - radius * 0.2, center.dy - radius * 0.2),
-      2.5,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawCircle(
-      Offset(center.dx + radius * 0.2, center.dy + radius * 0.2),
-      2.5,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.fill,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _AccountIcon extends StatelessWidget {

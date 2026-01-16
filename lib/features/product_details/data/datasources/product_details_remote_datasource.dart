@@ -1,10 +1,11 @@
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/product_details_model.dart';
+import '../../domain/entities/product_details.dart';
 
 abstract class ProductDetailsRemoteDataSource {
   Future<ProductDetailsModel> getProductDetails(int productId);
-  Future<List<ProductAddonModel>> getProductAddons(int productId);
+  Future<List<ProductAddon>> getProductAddons(int productId);
 }
 
 class ProductDetailsRemoteDataSourceImpl
@@ -32,21 +33,22 @@ class ProductDetailsRemoteDataSourceImpl
   }
 
   @override
-  Future<List<ProductAddonModel>> getProductAddons(int productId) async {
+  Future<List<ProductAddon>> getProductAddons(int productId) async {
     try {
       final response = await apiClient.get(
         ApiConstants.getProductAddons,
         queryParameters: {'product_id2': productId},
       );
 
-      if (response is List) {
-        return response
-            .map((json) => ProductAddonModel.fromJson(json))
-            .toList();
+      if (response is Map<String, dynamic>) {
+        // Parse using the ProductAddonsResponse
+        final addonsResponse = ProductAddonsResponse.fromJson(response);
+        return addonsResponse.addons;
       }
 
-      if (response is Map && response['addons'] != null) {
-        return (response['addons'] as List)
+      if (response is List) {
+        // Legacy format
+        return response
             .map((json) => ProductAddonModel.fromJson(json))
             .toList();
       }

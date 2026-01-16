@@ -16,11 +16,28 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
     result.fold(
       (failure) => emit(ProductDetailsError(message: failure.message)),
       (product) {
-        final basePrice = double.tryParse(product.price) ?? 0;
+        // Use priceTax if available, otherwise use price
+        double basePrice =
+            product.priceTax?.toDouble() ??
+            (double.tryParse(product.price) ?? 0);
+
+        // Initialize selected options with default selections
+        final Map<String, List<String>> initialSelections = {};
+        for (final addon in product.addons) {
+          final defaultSelected = addon.options
+              .where((opt) => opt.isSelectedByDefault)
+              .map((opt) => opt.label)
+              .toList();
+          if (defaultSelected.isNotEmpty) {
+            initialSelections[addon.id] = defaultSelected;
+          }
+        }
+
         emit(
           ProductDetailsLoaded(
             product: product,
             quantity: 1,
+            selectedOptions: initialSelections,
             totalPrice: basePrice,
           ),
         );
@@ -44,16 +61,18 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
     }
   }
 
-  void toggleOption(int addonId, String optionLabel, bool isRadio) {
+  void toggleOption(String addonId, String optionLabel, bool isRadio) {
     final currentState = state;
     if (currentState is ProductDetailsLoaded) {
-      final newSelectedOptions = Map<int, List<String>>.from(
+      final newSelectedOptions = Map<String, List<String>>.from(
         currentState.selectedOptions,
       );
 
       if (isRadio) {
+        // Radio: only one selection allowed
         newSelectedOptions[addonId] = [optionLabel];
       } else {
+        // Checkbox: multiple selections allowed
         final currentOptions = List<String>.from(
           newSelectedOptions[addonId] ?? [],
         );
@@ -73,7 +92,9 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
 
   void _updateTotalPrice(ProductDetailsLoaded state) {
     final product = state.product;
-    double basePrice = double.tryParse(product.price) ?? 0;
+    // Use priceTax if available
+    double basePrice =
+        product.priceTax?.toDouble() ?? (double.tryParse(product.price) ?? 0);
     double addonsPrice = 0;
 
     for (final addon in product.addons) {
@@ -102,7 +123,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         if (selectedLabels.contains(option.label)) {
           addons.add({
             'id': addon.id,
-            'name': option.label,
+            'name': option.displayLabel, // Use Arabic label
             'price': option.price,
           });
         }

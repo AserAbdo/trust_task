@@ -20,18 +20,30 @@ class CartCubit extends Cubit<CartState> {
   }) : super(CartInitial());
 
   Future<void> loadCart() async {
+    // If cart is already loaded with items, just emit current state
+    if (_localCart.isNotEmpty) {
+      final cart = CartModel.fromItems(_localCart);
+      emit(CartLoaded(cart: cart));
+      return;
+    }
+
     emit(CartLoading());
 
     final result = await getCartUseCase();
 
     result.fold(
       (failure) {
+        // If API fails, use local cart
         final cart = CartModel.fromItems(_localCart);
         emit(CartLoaded(cart: cart));
       },
       (cart) {
-        _localCart = List.from(cart.items);
-        emit(CartLoaded(cart: cart));
+        // Merge API cart with local cart
+        if (cart.items.isNotEmpty) {
+          _localCart = List.from(cart.items);
+        }
+        final currentCart = CartModel.fromItems(_localCart);
+        emit(CartLoaded(cart: currentCart));
       },
     );
   }

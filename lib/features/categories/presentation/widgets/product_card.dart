@@ -22,8 +22,10 @@ class ProductCard extends StatelessWidget {
     // Colors
     const Color redColor = Color(0xFFCE1330);
     const Color textDark = Color(0xFF2D2D2D);
-    const Color textGrey = Color(0xFF757575);
-    const Color cardColor = Color(0xFFFAF0E6); // Same as background linen
+    const Color cardColor = Color(0xFFFAF0E6);
+
+    // Use displayPrice from Product model (already formatted without decimals)
+    String formattedPrice = product.displayPrice;
 
     return GestureDetector(
       onTap: onTap,
@@ -137,7 +139,7 @@ class ProductCard extends StatelessWidget {
                     textDirection: TextDirection.rtl,
                     children: [
                       Text(
-                        product.price,
+                        formattedPrice,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -148,7 +150,7 @@ class ProductCard extends StatelessWidget {
                       Text(
                         l10n.translate('currency_symbol'),
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: textDark,
                         ),
@@ -165,20 +167,20 @@ class ProductCard extends StatelessWidget {
             GestureDetector(
               onTap: onAddToCart,
               child: Container(
-                width: 38,
-                height: 38,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
                   color: redColor,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
                       color: redColor.withValues(alpha: 0.25),
-                      blurRadius: 6,
+                      blurRadius: 5,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: const Icon(Icons.add, color: Colors.white, size: 22),
+                child: const Icon(Icons.add, color: Colors.white, size: 20),
               ),
             ),
           ],
