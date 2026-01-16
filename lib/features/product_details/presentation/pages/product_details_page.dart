@@ -73,7 +73,7 @@ class _ProductDetailsView extends StatelessWidget {
       leadingWidth: 120,
       // Back button on the LEFT
       leading: Padding(
-        padding: const EdgeInsets.only(left: 16),
+        padding: const EdgeInsets.only(left: 20),
         child: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
@@ -118,7 +118,7 @@ class _ProductDetailsView extends StatelessWidget {
       // Cart icon with badge on the RIGHT
       actions: [
         Padding(
-          padding: const EdgeInsets.only(right: 16),
+          padding: const EdgeInsets.only(right: 20),
           child: _buildCartIconWithBadge(),
         ),
       ],
@@ -368,23 +368,38 @@ class _ProductDetailsView extends StatelessWidget {
   }
 
   Widget _buildDescription(BuildContext context, String description) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        description,
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.grey.shade700,
-          height: 1.6,
+    return Column(
+      children: [
+        // Top divider
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Divider(color: Colors.grey.shade300, thickness: 1),
         ),
-        textDirection: TextDirection.rtl,
-        textAlign: TextAlign.center,
-      ),
+        const SizedBox(height: 12),
+
+        // Description text
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            description,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+              height: 1.6,
+            ),
+            textDirection: TextDirection.rtl,
+            textAlign: TextAlign.center,
+          ),
+        ),
+
+        const SizedBox(height: 12),
+        // Bottom divider
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Divider(color: Colors.grey.shade300, thickness: 1),
+        ),
+      ],
     );
   }
 
@@ -443,7 +458,7 @@ class _ProductDetailsView extends StatelessWidget {
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             child: Text(
