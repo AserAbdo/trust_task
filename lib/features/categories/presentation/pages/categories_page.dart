@@ -72,10 +72,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
         const SizedBox(height: 12),
         // Category Tabs
         _buildCategoryTabs(categories, selectedIndex, l10n),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         // Section Header
         _buildSectionHeader(selectedCategory, l10n),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         // Products List
         Expanded(child: _buildProductsList(selectedCategory, l10n)),
       ],
@@ -87,39 +87,31 @@ class _CategoriesPageState extends State<CategoriesPage> {
     int selectedIndex,
     AppLocalizations l10n,
   ) {
-    // Create tabs with icons
-    final tabs = [
-      {
-        'label': l10n.translate('dushka_burger_offers'),
-        'icon': Icons.local_offer,
-      },
-      {'label': l10n.translate('app_offers'), 'icon': Icons.phone_android},
-    ];
-
     return SizedBox(
       height: 48,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        reverse: true, // RTL support
-        itemCount: categories.length < 2 ? categories.length : 2,
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          final reversedIndex =
-              (categories.length < 2 ? categories.length : 2) - 1 - index;
-          return CategoryTab(
-            label: categories.length > reversedIndex
-                ? categories[reversedIndex].name
-                : tabs[reversedIndex]['label'] as String,
-            isSelected: reversedIndex == selectedIndex,
-            icon: tabs.length > reversedIndex
-                ? tabs[reversedIndex]['icon'] as IconData
-                : null,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Tab 2: عروض الابلكيشن (App Offers) - on the LEFT
+          CategoryTab(
+            label: l10n.translate('app_offers'),
+            isSelected: selectedIndex == 1,
+            icon: Icons.phone_android,
             onTap: () {
-              context.read<CategoriesCubit>().selectTab(reversedIndex);
+              context.read<CategoriesCubit>().selectTab(1);
             },
-          );
-        },
+          ),
+          const SizedBox(width: 10),
+          // Tab 1: عروض دوشكا برجر (Dushka Burger Offers) - on the RIGHT
+          CategoryTab(
+            label: l10n.translate('dushka_burger_offers'),
+            isSelected: selectedIndex == 0,
+            emoji: '🍔',
+            onTap: () {
+              context.read<CategoriesCubit>().selectTab(0);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -128,31 +120,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
     if (category == null) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppTheme.primaryColor.withValues(alpha: 0.08),
-              AppTheme.primaryLight.withValues(alpha: 0.15),
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppTheme.primaryColor.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Align(
+        alignment: Alignment.centerRight,
         child: Text(
           category.name,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppTheme.primaryDark,
+            color: Color(0xFF424242),
           ),
           textAlign: TextAlign.right,
         ),
