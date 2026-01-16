@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/back_button.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../cubit/product_details_cubit.dart';
 import '../cubit/product_details_state.dart';
@@ -70,41 +71,12 @@ class _ProductDetailsView extends StatelessWidget {
       elevation: 0,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      leadingWidth: 120,
+      leadingWidth: 140,
       // Back button on the LEFT
       leading: Padding(
-        padding: const EdgeInsets.only(left: 20),
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.arrow_forward, size: 16, color: redColor),
-                const SizedBox(width: 4),
-                Text(
-                  l10n.translate('back'),
-                  style: const TextStyle(
-                    color: redColor,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
+        padding: const EdgeInsets.only(left: 12),
+        child: Center(
+          child: CustomBackButton(onPressed: () => Navigator.pop(context)),
         ),
       ),
       title: Text(
@@ -118,7 +90,7 @@ class _ProductDetailsView extends StatelessWidget {
       // Cart icon with badge on the RIGHT
       actions: [
         Padding(
-          padding: const EdgeInsets.only(right: 20),
+          padding: const EdgeInsets.only(left: 16),
           child: _buildCartIconWithBadge(),
         ),
       ],
@@ -327,11 +299,11 @@ class _ProductDetailsView extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: linenColor,
+                color: Colors.grey.shade300,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey.shade400, width: 2),
               ),
-              child: Icon(Icons.remove, color: Colors.grey.shade500, size: 24),
+              child: Icon(Icons.remove, color: Colors.grey.shade600, size: 24),
             ),
           ),
 
@@ -370,11 +342,8 @@ class _ProductDetailsView extends StatelessWidget {
   Widget _buildDescription(BuildContext context, String description) {
     return Column(
       children: [
-        // Top divider
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Divider(color: Colors.grey.shade300, thickness: 1),
-        ),
+        // Top divider with blur
+        _buildBlurredDivider(),
         const SizedBox(height: 12),
 
         // Description text
@@ -389,17 +358,35 @@ class _ProductDetailsView extends StatelessWidget {
               height: 1.6,
             ),
             textDirection: TextDirection.rtl,
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.right,
           ),
         ),
 
         const SizedBox(height: 12),
-        // Bottom divider
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Divider(color: Colors.grey.shade300, thickness: 1),
-        ),
+        // Bottom divider with blur
+        _buildBlurredDivider(),
       ],
+    );
+  }
+
+  Widget _buildBlurredDivider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        height: 2,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade400,
+          borderRadius: BorderRadius.circular(1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 4,
+              spreadRadius: 1,
+              offset: const Offset(0, 0),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

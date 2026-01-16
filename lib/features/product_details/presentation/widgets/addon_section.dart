@@ -68,11 +68,25 @@ class AddonSection extends StatelessWidget {
           return _buildOptionTile(context, option, isSelected, isRadio);
         }),
 
-        // Divider between addons
+        // Divider between addons with blur effect
         if (showDivider)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Divider(color: Colors.grey.shade300, thickness: 1),
+            child: Container(
+              height: 2,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 0),
+                  ),
+                ],
+              ),
+            ),
           ),
       ],
     );
