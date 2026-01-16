@@ -240,8 +240,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Widget _buildBottomNavBar(AppLocalizations l10n) {
-    const Color brownColor = Color(0xFF5D4037);
-    const Color greyColor = Color(0xFFBDBDBD);
+    const Color darkBrown = Color(0xFF412216);
+    const Color greyColor = Color(0xFF9B806E);
 
     return Container(
       decoration: BoxDecoration(
@@ -266,7 +266,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 icon: _HomeIcon(isSelected: _currentNavIndex == 0),
                 label: l10n.translate('home'),
                 index: 0,
-                selectedColor: brownColor,
+                selectedColor: darkBrown,
                 unselectedColor: greyColor,
               ),
               // القائمة (Menu)
@@ -274,7 +274,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 icon: _MenuIcon(isSelected: _currentNavIndex == 1),
                 label: l10n.translate('menu'),
                 index: 1,
-                selectedColor: brownColor,
+                selectedColor: darkBrown,
                 unselectedColor: greyColor,
               ),
               // Cart FAB (Center)
@@ -284,7 +284,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 icon: _OffersIcon(isSelected: _currentNavIndex == 3),
                 label: l10n.translate('offers'),
                 index: 3,
-                selectedColor: brownColor,
+                selectedColor: darkBrown,
                 unselectedColor: greyColor,
               ),
               // الحساب (Account) - Left side in RTL
@@ -292,7 +292,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 icon: _AccountIcon(isSelected: _currentNavIndex == 4),
                 label: l10n.translate('account'),
                 index: 4,
-                selectedColor: brownColor,
+                selectedColor: darkBrown,
                 unselectedColor: greyColor,
               ),
             ],
@@ -340,7 +340,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Widget _buildCartFab() {
-    const Color brownColor = Color(0xFF5D4037);
+    const Color darkBrown = Color(0xFF412216);
 
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
@@ -357,11 +357,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
               width: 65,
               height: 65,
               decoration: BoxDecoration(
-                color: brownColor,
+                color: darkBrown,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: brownColor.withValues(alpha: 0.4),
+                    color: darkBrown.withValues(alpha: 0.4),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -385,7 +385,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                         decoration: BoxDecoration(
                           color: const Color(0xFF8BC34A),
                           shape: BoxShape.circle,
-                          border: Border.all(color: brownColor, width: 2),
+                          border: Border.all(color: darkBrown, width: 2),
                         ),
                         child: Center(
                           child: Text(
@@ -464,12 +464,12 @@ class _HomeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color brownColor = Color(0xFF5D4037);
-    const Color greyColor = Color(0xFFBDBDBD);
+    const Color darkBrown = Color(0xFF412216);
+    const Color greyColor = Color(0xFF9B806E);
 
     return Icon(
-      isSelected ? Icons.home : Icons.home_outlined,
-      color: isSelected ? brownColor : greyColor,
+      isSelected ? Icons.home_rounded : Icons.home_outlined,
+      color: isSelected ? darkBrown : greyColor,
       size: 26,
     );
   }
@@ -481,21 +481,25 @@ class _MenuIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color brownColor = Color(0xFF5D4037);
-    const Color greyColor = Color(0xFFBDBDBD);
+    const Color darkBrown = Color(0xFF412216);
+    const Color greyColor = Color(0xFF9B806E);
 
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: isSelected ? brownColor : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(
-        Icons.menu_book,
-        color: isSelected ? Colors.white : greyColor,
-        size: 22,
-      ),
-    );
+    if (isSelected) {
+      return Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: darkBrown,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Icon(
+          Icons.auto_stories_rounded,
+          color: Colors.white,
+          size: 20,
+        ),
+      );
+    }
+
+    return Icon(Icons.auto_stories_outlined, color: greyColor, size: 26);
   }
 }
 
@@ -505,14 +509,98 @@ class _OffersIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color brownColor = Color(0xFF5D4037);
-    const Color greyColor = Color(0xFFBDBDBD);
+    const Color darkBrown = Color(0xFF412216);
+    const Color greyColor = Color(0xFF9B806E);
 
-    return Icon(
-      isSelected ? Icons.percent : Icons.percent_outlined,
-      color: isSelected ? brownColor : greyColor,
-      size: 26,
+    // Custom offers icon with percentage and gear style
+    return CustomPaint(
+      size: const Size(26, 26),
+      painter: _OffersIconPainter(
+        color: isSelected ? darkBrown : greyColor,
+        isSelected: isSelected,
+      ),
     );
+  }
+}
+
+class _OffersIconPainter extends CustomPainter {
+  final Color color;
+  final bool isSelected;
+
+  _OffersIconPainter({required this.color, required this.isSelected});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = isSelected ? PaintingStyle.fill : PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    // Draw circle with percentage inside
+    final center = Offset(size.width / 2, size.height / 2);
+    canvas.drawCircle(center, size.width * 0.35, paint);
+
+    // Draw percentage symbol
+    final textPaint = Paint()
+      ..color = isSelected ? Colors.white : color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    // Draw % dots
+    canvas.drawCircle(
+      Offset(size.width * 0.35, size.height * 0.35),
+      2,
+      Paint()..color = isSelected ? Colors.white : color,
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.65, size.height * 0.65),
+      2,
+      Paint()..color = isSelected ? Colors.white : color,
+    );
+
+    // Draw slash
+    canvas.drawLine(
+      Offset(size.width * 0.65, size.height * 0.35),
+      Offset(size.width * 0.35, size.height * 0.65),
+      textPaint,
+    );
+
+    // Draw gear teeth around
+    for (int i = 0; i < 8; i++) {
+      final angle = i * 3.14159 / 4;
+      final x1 = center.dx + size.width * 0.38 * cos(angle);
+      final y1 = center.dy + size.width * 0.38 * sin(angle);
+      final x2 = center.dx + size.width * 0.45 * cos(angle);
+      final y2 = center.dy + size.width * 0.45 * sin(angle);
+
+      canvas.drawLine(
+        Offset(x1, y1),
+        Offset(x2, y2),
+        Paint()
+          ..color = color
+          ..strokeWidth = 2
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+  }
+
+  double cos(double x) => x.cos();
+  double sin(double x) => x.sin();
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+extension on double {
+  double cos() => _cos(this);
+  double sin() => _sin(this);
+
+  static double _cos(double x) {
+    return 1 - x * x / 2 + x * x * x * x / 24 - x * x * x * x * x * x / 720;
+  }
+
+  static double _sin(double x) {
+    return x - x * x * x / 6 + x * x * x * x * x / 120;
   }
 }
 
@@ -522,12 +610,12 @@ class _AccountIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color brownColor = Color(0xFF5D4037);
-    const Color greyColor = Color(0xFFBDBDBD);
+    const Color darkBrown = Color(0xFF412216);
+    const Color greyColor = Color(0xFF9B806E);
 
     return Icon(
-      isSelected ? Icons.person : Icons.person_outline,
-      color: isSelected ? brownColor : greyColor,
+      isSelected ? Icons.person_rounded : Icons.person_outline_rounded,
+      color: isSelected ? darkBrown : greyColor,
       size: 26,
     );
   }
@@ -539,63 +627,64 @@ class _CartIconPainter extends CustomPainter {
     final paint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
+      ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
 
-    // Draw bag body
+    // Draw shopping bag body
     final bagPath = Path();
-    bagPath.moveTo(size.width * 0.2, size.height * 0.35);
-    bagPath.lineTo(size.width * 0.15, size.height * 0.9);
+    bagPath.moveTo(size.width * 0.15, size.height * 0.4);
+    bagPath.lineTo(size.width * 0.1, size.height * 0.85);
     bagPath.quadraticBezierTo(
-      size.width * 0.15,
-      size.height,
-      size.width * 0.25,
-      size.height,
+      size.width * 0.1,
+      size.height * 0.95,
+      size.width * 0.2,
+      size.height * 0.95,
     );
-    bagPath.lineTo(size.width * 0.75, size.height);
+    bagPath.lineTo(size.width * 0.8, size.height * 0.95);
     bagPath.quadraticBezierTo(
-      size.width * 0.85,
-      size.height,
-      size.width * 0.85,
-      size.height * 0.9,
+      size.width * 0.9,
+      size.height * 0.95,
+      size.width * 0.9,
+      size.height * 0.85,
     );
-    bagPath.lineTo(size.width * 0.8, size.height * 0.35);
+    bagPath.lineTo(size.width * 0.85, size.height * 0.4);
     bagPath.close();
 
     canvas.drawPath(bagPath, paint);
 
     // Draw handle
     final handlePath = Path();
-    handlePath.moveTo(size.width * 0.3, size.height * 0.35);
+    handlePath.moveTo(size.width * 0.3, size.height * 0.4);
     handlePath.quadraticBezierTo(
       size.width * 0.3,
-      size.height * 0.1,
+      size.height * 0.15,
       size.width * 0.5,
-      size.height * 0.1,
+      size.height * 0.15,
     );
     handlePath.quadraticBezierTo(
       size.width * 0.7,
-      size.height * 0.1,
+      size.height * 0.15,
       size.width * 0.7,
-      size.height * 0.35,
+      size.height * 0.4,
     );
 
     canvas.drawPath(handlePath, paint);
 
-    // Draw smile
+    // Draw smile face
     final smilePaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
+      ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
+    // Smile curve
     final smilePath = Path();
-    smilePath.moveTo(size.width * 0.35, size.height * 0.6);
+    smilePath.moveTo(size.width * 0.35, size.height * 0.62);
     smilePath.quadraticBezierTo(
       size.width * 0.5,
-      size.height * 0.75,
+      size.height * 0.78,
       size.width * 0.65,
-      size.height * 0.6,
+      size.height * 0.62,
     );
 
     canvas.drawPath(smilePath, smilePaint);

@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Brand Colors - Dushka Burger
-  static const Color primaryColor = Color(0xFFD32F2F);
-  static const Color primaryLight = Color(0xFFFFCDD2);
-  static const Color primaryDark = Color(0xFFB71C1C);
-  static const Color accentColor = Color(0xFFFF5722);
+  // Brand Colors from Design Analysis
+  static const Color primaryColor = Color(0xFFCE1330); // Red accent
+  static const Color primaryLight = Color(0xFFFFE4E1); // Light pink
+  static const Color primaryDark = Color(0xFFB71C1C); // Dark red
 
   // Background Colors
-  static const Color backgroundColor = Color(0xFFFAF6F3);
+  static const Color backgroundColor = Color(0xFFF9F0E8); // Beige background
   static const Color surfaceColor = Colors.white;
   static const Color cardColor = Colors.white;
 
+  // Brown Colors
+  static const Color brownPrimary = Color(
+    0xFF412216,
+  ); // Dark brown (text/icons)
+  static const Color brownSecondary = Color(0xFF9B806E); // Brown secondary
+  static const Color brownLight = Color(0xFFE1D6CE); // Light tan
+
   // Text Colors
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textLight = Color(0xFF9E9E9E);
+  static const Color textPrimary = Color(0xFF412216); // Dark brown
+  static const Color textSecondary = Color(0xFF9B806E); // Brown secondary
+  static const Color textLight = Color(0xFFBDBDBD); // Grey
 
   // Other Colors
   static const Color dividerColor = Color(0xFFE0E0E0);
@@ -29,7 +35,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         primary: primaryColor,
-        secondary: accentColor,
+        secondary: brownPrimary,
         surface: surfaceColor,
         error: errorColor,
       ),
@@ -129,8 +135,8 @@ class AppTheme {
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: surfaceColor,
-        selectedItemColor: primaryColor,
-        unselectedItemColor: textSecondary,
+        selectedItemColor: brownPrimary,
+        unselectedItemColor: textLight,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
