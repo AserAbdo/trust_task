@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'core/cubit/language_cubit.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
@@ -15,58 +16,56 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-
-  static void setLocale(BuildContext context, Locale locale) {
-    final state = context.findAncestorStateOfType<_MyAppState>();
-    state?.setLocale(locale);
-  }
-}
-
-class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale('ar');
-
-  void setLocale(Locale locale) {
-    setState(() {
-      _locale = locale;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<LanguageCubit>.value(value: di.sl<LanguageCubit>()),
         BlocProvider<CategoriesCubit>(
           create: (context) => di.sl<CategoriesCubit>(),
         ),
         BlocProvider<CartCubit>(create: (context) => di.sl<CartCubit>()),
       ],
-      child: MaterialApp(
-        title: 'Dushka Burger',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        locale: _locale,
-        supportedLocales: const [Locale('en'), Locale('ar')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        builder: (context, child) {
-          return Directionality(
-            textDirection: _locale.languageCode == 'ar'
-                ? TextDirection.rtl
-                : TextDirection.ltr,
-            child: child!,
-          );
-        },
-        home: const CategoriesPage(),
-      ),
+      child: const _AppContent(),
+    );
+  }
+}
+
+class _AppContent extends StatelessWidget {
+  const _AppContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      builder: (context, languageState) {
+        final locale = languageState.locale;
+
+        return MaterialApp(
+          title: 'Dushka Burger',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          locale: locale,
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) {
+            return Directionality(
+              textDirection: locale.languageCode == 'ar'
+                  ? TextDirection.rtl
+                  : TextDirection.ltr,
+              child: child!,
+            );
+          },
+          home: const CategoriesPage(),
+        );
+      },
     );
   }
 }

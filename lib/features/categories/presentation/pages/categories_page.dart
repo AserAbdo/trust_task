@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../account/presentation/pages/account_page.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/presentation/cubit/cart_state.dart';
 import '../../../cart/presentation/pages/cart_page.dart';
@@ -321,9 +322,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
     final isSelected = _currentNavIndex == index;
     return InkWell(
       onTap: () {
-        setState(() {
-          _currentNavIndex = index;
-        });
+        if (index == 4) {
+          // Navigate to Account page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AccountPage()),
+          );
+        } else {
+          setState(() {
+            _currentNavIndex = index;
+          });
+        }
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

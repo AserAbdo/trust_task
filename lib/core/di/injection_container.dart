@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../cubit/language_cubit.dart';
 import '../network/api_client.dart';
 import '../utils/guest_manager.dart';
 import '../../features/categories/data/datasources/categories_remote_datasource.dart';
@@ -24,6 +25,9 @@ final sl = GetIt.instance;
 Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
+
+  // Language Cubit (must be registered before other cubits)
+  sl.registerLazySingleton<LanguageCubit>(() => LanguageCubit(prefs: sl()));
 
   sl.registerLazySingleton(() => ApiClient());
 
