@@ -514,94 +514,93 @@ class _OffersIcon extends StatelessWidget {
 
     // Custom offers icon with percentage and gear style
     return CustomPaint(
-      size: const Size(26, 26),
-      painter: _OffersIconPainter(
-        color: isSelected ? darkBrown : greyColor,
-        isSelected: isSelected,
-      ),
+      size: const Size(28, 28),
+      painter: _OffersIconPainter(color: isSelected ? darkBrown : greyColor),
     );
   }
 }
 
 class _OffersIconPainter extends CustomPainter {
   final Color color;
-  final bool isSelected;
 
-  _OffersIconPainter({required this.color, required this.isSelected});
+  _OffersIconPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..style = isSelected ? PaintingStyle.fill : PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-
-    // Draw circle with percentage inside
-    final center = Offset(size.width / 2, size.height / 2);
-    canvas.drawCircle(center, size.width * 0.35, paint);
-
-    // Draw percentage symbol
-    final textPaint = Paint()
-      ..color = isSelected ? Colors.white : color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round;
 
-    // Draw % dots
-    canvas.drawCircle(
-      Offset(size.width * 0.35, size.height * 0.35),
-      2,
-      Paint()..color = isSelected ? Colors.white : color,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.65, size.height * 0.65),
-      2,
-      Paint()..color = isSelected ? Colors.white : color,
-    );
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width * 0.32;
 
-    // Draw slash
-    canvas.drawLine(
-      Offset(size.width * 0.65, size.height * 0.35),
-      Offset(size.width * 0.35, size.height * 0.65),
-      textPaint,
-    );
+    // Draw main circle
+    canvas.drawCircle(center, radius, paint);
 
-    // Draw gear teeth around
+    // Draw gear teeth (8 teeth)
     for (int i = 0; i < 8; i++) {
-      final angle = i * 3.14159 / 4;
-      final x1 = center.dx + size.width * 0.38 * cos(angle);
-      final y1 = center.dy + size.width * 0.38 * sin(angle);
-      final x2 = center.dx + size.width * 0.45 * cos(angle);
-      final y2 = center.dy + size.width * 0.45 * sin(angle);
+      final angle = i * 3.14159 * 2 / 8;
+      final innerRadius = radius;
+      final outerRadius = radius + size.width * 0.12;
+
+      final x1 = center.dx + innerRadius * _cos(angle);
+      final y1 = center.dy + innerRadius * _sin(angle);
+      final x2 = center.dx + outerRadius * _cos(angle);
+      final y2 = center.dy + outerRadius * _sin(angle);
 
       canvas.drawLine(
         Offset(x1, y1),
         Offset(x2, y2),
         Paint()
           ..color = color
-          ..strokeWidth = 2
+          ..strokeWidth = 3
           ..strokeCap = StrokeCap.round,
       );
     }
+
+    // Draw percentage symbol inside
+    final percentPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    // Draw slash
+    canvas.drawLine(
+      Offset(center.dx + radius * 0.4, center.dy - radius * 0.4),
+      Offset(center.dx - radius * 0.4, center.dy + radius * 0.4),
+      percentPaint,
+    );
+
+    // Draw two small circles for %
+    canvas.drawCircle(
+      Offset(center.dx - radius * 0.25, center.dy - radius * 0.25),
+      3,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawCircle(
+      Offset(center.dx + radius * 0.25, center.dy + radius * 0.25),
+      3,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.fill,
+    );
   }
 
-  double cos(double x) => x.cos();
-  double sin(double x) => x.sin();
+  double _cos(double x) {
+    // Using dart:math would be better but using Taylor series for simplicity
+    return 1 - x * x / 2 + x * x * x * x / 24;
+  }
+
+  double _sin(double x) {
+    return x - x * x * x / 6 + x * x * x * x * x / 120;
+  }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-extension on double {
-  double cos() => _cos(this);
-  double sin() => _sin(this);
-
-  static double _cos(double x) {
-    return 1 - x * x / 2 + x * x * x * x / 24 - x * x * x * x * x * x / 720;
-  }
-
-  static double _sin(double x) {
-    return x - x * x * x / 6 + x * x * x * x * x / 120;
-  }
 }
 
 class _AccountIcon extends StatelessWidget {
@@ -613,12 +612,66 @@ class _AccountIcon extends StatelessWidget {
     const Color darkBrown = Color(0xFF412216);
     const Color greyColor = Color(0xFF9B806E);
 
-    return Icon(
-      isSelected ? Icons.person_rounded : Icons.person_outline_rounded,
-      color: isSelected ? darkBrown : greyColor,
-      size: 26,
+    // Person icon inside a circle
+    return CustomPaint(
+      size: const Size(28, 28),
+      painter: _AccountIconPainter(color: isSelected ? darkBrown : greyColor),
     );
   }
+}
+
+class _AccountIconPainter extends CustomPainter {
+  final Color color;
+
+  _AccountIconPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width * 0.42;
+
+    // Draw outer circle
+    canvas.drawCircle(center, radius, paint);
+
+    // Draw head (small circle)
+    final headRadius = size.width * 0.12;
+    final headCenter = Offset(center.dx, center.dy - size.height * 0.08);
+    canvas.drawCircle(headCenter, headRadius, paint);
+
+    // Draw body (arc at bottom)
+    final bodyPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8;
+
+    final bodyPath = Path();
+    bodyPath.moveTo(
+      center.dx - size.width * 0.18,
+      center.dy + size.height * 0.28,
+    );
+    bodyPath.quadraticBezierTo(
+      center.dx - size.width * 0.18,
+      center.dy + size.height * 0.08,
+      center.dx,
+      center.dy + size.height * 0.08,
+    );
+    bodyPath.quadraticBezierTo(
+      center.dx + size.width * 0.18,
+      center.dy + size.height * 0.08,
+      center.dx + size.width * 0.18,
+      center.dy + size.height * 0.28,
+    );
+
+    canvas.drawPath(bodyPath, bodyPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _CartIconPainter extends CustomPainter {
