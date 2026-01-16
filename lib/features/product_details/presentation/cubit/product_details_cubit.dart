@@ -11,7 +11,9 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
   Future<void> loadProductDetails(int productId) async {
     emit(ProductDetailsLoading());
 
-    final result = await getProductDetailsUseCase(productId);
+    final result = await getProductDetailsUseCase(
+      ProductDetailsParams(productId: productId),
+    );
 
     result.fold(
       (failure) => emit(ProductDetailsError(message: failure.message)),

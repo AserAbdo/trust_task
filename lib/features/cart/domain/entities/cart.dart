@@ -13,6 +13,16 @@ class Cart extends Equatable {
     this.total = 0,
   });
 
+  /// Factory constructor to create Cart from items list
+  /// Automatically calculates subtotal, tax, and total
+  factory Cart.fromItems(List<CartItem> items) {
+    final subtotal = items.fold<double>(0, (sum, item) => sum + item.itemTotal);
+    final tax = subtotal * 0.14; // 14% tax
+    final total = subtotal + tax;
+
+    return Cart(items: items, subtotal: subtotal, tax: tax, total: total);
+  }
+
   Cart copyWith({
     List<CartItem>? items,
     double? subtotal,

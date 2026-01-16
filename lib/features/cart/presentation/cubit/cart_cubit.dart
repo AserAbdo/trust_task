@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/models/cart_model.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../../domain/entities/cart.dart';
 import '../../domain/usecases/cart_usecases.dart';
 import 'cart_state.dart';
 
+/// Cubit for managing cart state
 class CartCubit extends Cubit<CartState> {
   final GetCartUseCase getCartUseCase;
   final AddToCartUseCase addToCartUseCase;
@@ -19,22 +20,23 @@ class CartCubit extends Cubit<CartState> {
     required this.clearCartUseCase,
   }) : super(CartInitial());
 
+  /// Load cart from API or use local cart
   Future<void> loadCart() async {
     // If cart is already loaded with items, just emit current state
     if (_localCart.isNotEmpty) {
-      final cart = CartModel.fromItems(_localCart);
+      final cart = Cart.fromItems(_localCart);
       emit(CartLoaded(cart: cart));
       return;
     }
 
     emit(CartLoading());
 
-    final result = await getCartUseCase();
+    final result = await getCartUseCase(const NoParams());
 
     result.fold(
       (failure) {
         // If API fails, use local cart
-        final cart = CartModel.fromItems(_localCart);
+        final cart = Cart.fromItems(_localCart);
         emit(CartLoaded(cart: cart));
       },
       (cart) {
@@ -42,12 +44,13 @@ class CartCubit extends Cubit<CartState> {
         if (cart.items.isNotEmpty) {
           _localCart = List.from(cart.items);
         }
-        final currentCart = CartModel.fromItems(_localCart);
+        final currentCart = Cart.fromItems(_localCart);
         emit(CartLoaded(cart: currentCart));
       },
     );
   }
 
+  /// Add item to cart
   Future<void> addToCart({
     required int productId,
     required String productName,
@@ -57,6 +60,8 @@ class CartCubit extends Cubit<CartState> {
     required int quantity,
     List<Map<String, dynamic>>? addons,
   }) async {
+    emit(CartUpdating(cart: Cart.fromItems(_localCart)));
+
     final existingIndex = _localCart.indexWhere(
       (item) => item.productId == productId,
     );
@@ -73,7 +78,7 @@ class CartCubit extends Cubit<CartState> {
       );
     } else {
       _localCart.add(
-        CartItemModel(
+        CartItem(
           productId: productId,
           productName: productName,
           productNameAr: productNameAr,
@@ -87,55 +92,73 @@ class CartCubit extends Cubit<CartState> {
 
     _emitUpdatedCart();
 
+    // Sync with API in background
     final result = await addToCartUseCase(
-      productId: productId,
-      quantity: quantity,
-      addons: addons,
+      AddToCartParams(productId: productId, quantity: quantity, addons: addons),
     );
 
     result.fold((failure) {}, (cart) {});
   }
 
+  /// Remove item from cart
   Future<void> removeFromCart(int productId) async {
+    emit(CartUpdating(cart: Cart.fromItems(_localCart)));
+
     _localCart.removeWhere((item) => item.productId == productId);
     _emitUpdatedCart();
 
-    await removeFromCartUseCase(productId: productId, quantity: 1);
+    await removeFromCartUseCase(
+      RemoveFromCartParams(productId: productId, quantity: 1),
+    );
   }
 
+  /// Increment item quantity
   Future<void> incrementQuantity(int productId) async {
     final index = _localCart.indexWhere((item) => item.productId == productId);
     if (index != -1) {
+      emit(CartUpdating(cart: Cart.fromItems(_localCart)));
+
       final item = _localCart[index];
       _localCart[index] = item.copyWith(quantity: item.quantity + 1);
       _emitUpdatedCart();
 
-      await addToCartUseCase(productId: productId, quantity: 1);
+      await addToCartUseCase(
+        AddToCartParams(productId: productId, quantity: 1),
+      );
     }
   }
 
+  /// Decrement item quantity
   Future<void> decrementQuantity(int productId) async {
     final index = _localCart.indexWhere((item) => item.productId == productId);
     if (index != -1) {
       final item = _localCart[index];
       if (item.quantity > 1) {
+        emit(CartUpdating(cart: Cart.fromItems(_localCart)));
+
         _localCart[index] = item.copyWith(quantity: item.quantity - 1);
         _emitUpdatedCart();
 
-        await removeFromCartUseCase(productId: productId, quantity: 1);
+        await removeFromCartUseCase(
+          RemoveFromCartParams(productId: productId, quantity: 1),
+        );
       } else {
         await removeFromCart(productId);
       }
     }
   }
 
+  /// Clear all items from cart
   Future<void> clearCart() async {
+    emit(CartUpdating(cart: Cart.fromItems(_localCart)));
+
     _localCart.clear();
     _emitUpdatedCart();
 
-    await clearCartUseCase();
+    await clearCartUseCase(const NoParams());
   }
 
+  /// Apply coupon code
   void applyCoupon(String code) {
     final currentState = state;
     if (currentState is CartLoaded) {
@@ -144,9 +167,10 @@ class CartCubit extends Cubit<CartState> {
   }
 
   void _emitUpdatedCart() {
-    final cart = CartModel.fromItems(_localCart);
+    final cart = Cart.fromItems(_localCart);
     emit(CartLoaded(cart: cart));
   }
 
+  /// Get total item count in cart
   int get itemCount => _localCart.fold(0, (sum, item) => sum + item.quantity);
 }

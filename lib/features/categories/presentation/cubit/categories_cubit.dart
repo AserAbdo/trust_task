@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/get_categories_usecase.dart';
 import 'categories_state.dart';
 
@@ -11,7 +12,7 @@ class CategoriesCubit extends Cubit<CategoriesState> {
   Future<void> loadCategories() async {
     emit(CategoriesLoading());
 
-    final result = await getCategoriesUseCase();
+    final result = await getCategoriesUseCase(const NoParams());
 
     result.fold(
       (failure) => emit(CategoriesError(message: failure.message)),

@@ -353,10 +353,16 @@ class _SettingsSection extends StatelessWidget {
             icon: Icons.notifications_rounded,
             title: l10n.translate('notifications'),
             subtitle: l10n.translate('receive_updates'),
-            trailing: Switch(
+            trailing: Switch.adaptive(
               value: true,
               onChanged: (value) {},
-              activeColor: AppTheme.primaryColor,
+              activeTrackColor: AppTheme.primaryColor,
+              thumbColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Colors.white;
+                }
+                return Colors.grey.shade400;
+              }),
             ),
           ),
           const Divider(height: 1, indent: 72),
