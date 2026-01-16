@@ -23,110 +23,131 @@ class ProductCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryLight.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(20),
+        child: Row(
+          children: [
+            // Add Button (Left side)
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                onPressed: onAddToCart,
+                icon: const Icon(
+                  Icons.add,
+                  color: AppTheme.primaryColor,
+                  size: 20,
                 ),
-                child: IconButton(
-                  onPressed: onAddToCart,
-                  icon: const Icon(
-                    Icons.add,
-                    color: AppTheme.primaryColor,
-                    size: 20,
+                padding: EdgeInsets.zero,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // Product Info (Center - right aligned text)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  padding: EdgeInsets.zero,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      product.name,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.right,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  const SizedBox(height: 4),
+                  Text(
+                    '${l10n.translate('currency_symbol')} ${product.price}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${product.price} ${l10n.translate('currency_symbol')}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
+                    textDirection: TextDirection.rtl,
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: product.image != null
-                    ? CachedNetworkImage(
-                        imageUrl: product.image!,
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          width: 80,
-                          height: 80,
-                          color: Colors.grey.shade200,
-                          child: const Center(
+            ),
+
+            const SizedBox(width: 12),
+
+            // Product Image (Right side)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: product.image != null && product.image!.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: product.image!,
+                      width: 75,
+                      height: 75,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        width: 75,
+                        height: 75,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               color: AppTheme.primaryColor,
                             ),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Container(
-                          width: 80,
-                          height: 80,
-                          color: Colors.grey.shade200,
-                          child: const Icon(
-                            Icons.fastfood,
-                            color: AppTheme.primaryColor,
-                            size: 40,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        width: 80,
-                        height: 80,
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 75,
+                        height: 75,
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.fastfood,
-                          color: AppTheme.primaryColor,
-                          size: 40,
+                          color: AppTheme.primaryColor.withValues(alpha: 0.5),
+                          size: 35,
                         ),
                       ),
-              ),
-            ],
-          ),
+                    )
+                  : Container(
+                      width: 75,
+                      height: 75,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.fastfood,
+                        color: AppTheme.primaryColor.withValues(alpha: 0.5),
+                        size: 35,
+                      ),
+                    ),
+            ),
+          ],
         ),
       ),
     );

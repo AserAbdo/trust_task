@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../cart/presentation/cubit/cart_state.dart';
 import '../../../cart/presentation/pages/cart_page.dart';
 import '../../../product_details/presentation/pages/product_details_page.dart';
 import '../../domain/entities/category.dart';
@@ -32,7 +33,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
     final l10n = context.l10n;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: const Color(0xFFFAF6F3),
       body: SafeArea(
         child: BlocBuilder<CategoriesCubit, CategoriesState>(
           builder: (context, state) {
@@ -54,45 +55,68 @@ class _CategoriesPageState extends State<CategoriesPage> {
           },
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(l10n),
-      floatingActionButton: _buildCartFab(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: _buildBottomNavBar(l10n),
     );
   }
 
   Widget _buildContent(CategoriesLoaded state, AppLocalizations l10n) {
     final categories = state.categories;
     final selectedIndex = state.selectedTabIndex;
-    final selectedCategory = categories.isNotEmpty
+    final selectedCategory =
+        categories.isNotEmpty && selectedIndex < categories.length
         ? categories[selectedIndex]
         : null;
 
     return Column(
       children: [
+        const SizedBox(height: 12),
+        // Category Tabs
+        _buildCategoryTabs(categories, selectedIndex, l10n),
         const SizedBox(height: 16),
-        _buildCategoryTabs(categories, selectedIndex),
-        const SizedBox(height: 16),
-        _buildCategoryHeader(selectedCategory, l10n),
+        // Section Header
+        _buildSectionHeader(selectedCategory, l10n),
         const SizedBox(height: 8),
+        // Products List
         Expanded(child: _buildProductsList(selectedCategory, l10n)),
       ],
     );
   }
 
-  Widget _buildCategoryTabs(List<Category> categories, int selectedIndex) {
+  Widget _buildCategoryTabs(
+    List<Category> categories,
+    int selectedIndex,
+    AppLocalizations l10n,
+  ) {
+    // Create tabs with icons
+    final tabs = [
+      {
+        'label': l10n.translate('dushka_burger_offers'),
+        'icon': Icons.local_offer,
+      },
+      {'label': l10n.translate('app_offers'), 'icon': Icons.phone_android},
+    ];
+
     return SizedBox(
-      height: 45,
+      height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: categories.length,
+        reverse: true, // RTL support
+        itemCount: categories.length < 2 ? categories.length : 2,
         separatorBuilder: (context, index) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
+          final reversedIndex =
+              (categories.length < 2 ? categories.length : 2) - 1 - index;
           return CategoryTab(
-            label: categories[index].name,
-            isSelected: index == selectedIndex,
+            label: categories.length > reversedIndex
+                ? categories[reversedIndex].name
+                : tabs[reversedIndex]['label'] as String,
+            isSelected: reversedIndex == selectedIndex,
+            icon: tabs.length > reversedIndex
+                ? tabs[reversedIndex]['icon'] as IconData
+                : null,
             onTap: () {
-              context.read<CategoriesCubit>().selectTab(index);
+              context.read<CategoriesCubit>().selectTab(reversedIndex);
             },
           );
         },
@@ -100,33 +124,37 @@ class _CategoriesPageState extends State<CategoriesPage> {
     );
   }
 
-  Widget _buildCategoryHeader(Category? category, AppLocalizations l10n) {
+  Widget _buildSectionHeader(Category? category, AppLocalizations l10n) {
     if (category == null) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppTheme.primaryColor.withValues(alpha: 0.1),
-              AppTheme.primaryLight.withValues(alpha: 0.3),
+              AppTheme.primaryColor.withValues(alpha: 0.08),
+              AppTheme.primaryLight.withValues(alpha: 0.15),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.primaryLight, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppTheme.primaryColor.withValues(alpha: 0.15),
+            width: 1,
+          ),
         ),
         child: Text(
           category.name,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppTheme.primaryDark,
+          style: const TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: AppTheme.primaryDark,
           ),
-          textAlign: context.isRtl ? TextAlign.right : TextAlign.left,
+          textAlign: TextAlign.right,
         ),
       ),
     );
@@ -138,17 +166,27 @@ class _CategoriesPageState extends State<CategoriesPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.fastfood_outlined,
-              size: 80,
-              color: Colors.grey.shade400,
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryLight.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.fastfood_outlined,
+                size: 50,
+                color: AppTheme.primaryColor.withValues(alpha: 0.5),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               l10n.translate('no_products'),
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(color: AppTheme.textSecondary),
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -156,7 +194,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 100),
+      padding: const EdgeInsets.only(top: 8, bottom: 100),
       itemCount: category.products.length,
       itemBuilder: (context, index) {
         final product = category.products[index];
@@ -176,17 +214,29 @@ class _CategoriesPageState extends State<CategoriesPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 80, color: Colors.red.shade300),
-            const SizedBox(height: 16),
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline,
+                size: 50,
+                color: Colors.red.shade400,
+              ),
+            ),
+            const SizedBox(height: 20),
             Text(
               l10n.translate('error'),
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -195,6 +245,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
               },
               icon: const Icon(Icons.refresh),
               label: Text(l10n.translate('retry')),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+              ),
             ),
           ],
         ),
@@ -202,66 +263,169 @@ class _CategoriesPageState extends State<CategoriesPage> {
     );
   }
 
-  Widget _buildBottomNav(AppLocalizations l10n) {
+  Widget _buildBottomNavBar(AppLocalizations l10n) {
+    const Color brownColor = Color(0xFF5D4037);
+    const Color greyColor = Color(0xFFBDBDBD);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
         ],
       ),
-      child: BottomNavigationBar(
-        currentIndex: _currentNavIndex,
-        onTap: (index) {
-          setState(() {
-            _currentNavIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person_outline),
-            activeIcon: const Icon(Icons.person),
-            label: l10n.translate('account'),
+      child: SafeArea(
+        child: Container(
+          height: 75,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // الرئيسية (Home) - Right side in RTL
+              _buildNavItem(
+                icon: _HomeIcon(isSelected: _currentNavIndex == 0),
+                label: l10n.translate('home'),
+                index: 0,
+                selectedColor: brownColor,
+                unselectedColor: greyColor,
+              ),
+              // القائمة (Menu)
+              _buildNavItem(
+                icon: _MenuIcon(isSelected: _currentNavIndex == 1),
+                label: l10n.translate('menu'),
+                index: 1,
+                selectedColor: brownColor,
+                unselectedColor: greyColor,
+              ),
+              // Cart FAB (Center)
+              _buildCartFab(),
+              // العروض (Offers)
+              _buildNavItem(
+                icon: _OffersIcon(isSelected: _currentNavIndex == 3),
+                label: l10n.translate('offers'),
+                index: 3,
+                selectedColor: brownColor,
+                unselectedColor: greyColor,
+              ),
+              // الحساب (Account) - Left side in RTL
+              _buildNavItem(
+                icon: _AccountIcon(isSelected: _currentNavIndex == 4),
+                label: l10n.translate('account'),
+                index: 4,
+                selectedColor: brownColor,
+                unselectedColor: greyColor,
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.restaurant_menu_outlined),
-            activeIcon: const Icon(Icons.restaurant_menu),
-            label: l10n.translate('menu'),
-          ),
-          const BottomNavigationBarItem(icon: SizedBox(width: 40), label: ''),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.local_offer_outlined),
-            activeIcon: const Icon(Icons.local_offer),
-            label: l10n.translate('offers'),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            activeIcon: const Icon(Icons.home),
-            label: l10n.translate('home'),
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required Widget icon,
+    required String label,
+    required int index,
+    required Color selectedColor,
+    required Color unselectedColor,
+  }) {
+    final isSelected = _currentNavIndex == index;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _currentNavIndex = index;
+        });
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: isSelected ? selectedColor : unselectedColor,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildCartFab() {
-    return BlocBuilder<CartCubit, dynamic>(
+    const Color brownColor = Color(0xFF5D4037);
+
+    return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
-        return FloatingActionButton(
-          onPressed: _navigateToCart,
-          backgroundColor: AppTheme.primaryColor,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.shopping_bag_outlined,
-            color: Colors.white,
-            size: 28,
+        int itemCount = 0;
+        if (cartState is CartLoaded) {
+          itemCount = cartState.cart.items.length;
+        }
+
+        return Transform.translate(
+          offset: const Offset(0, -25),
+          child: GestureDetector(
+            onTap: _navigateToCart,
+            child: Container(
+              width: 65,
+              height: 65,
+              decoration: BoxDecoration(
+                color: brownColor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: brownColor.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Cart icon with smile
+                  CustomPaint(
+                    size: const Size(32, 32),
+                    painter: _CartIconPainter(),
+                  ),
+                  if (itemCount > 0)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF8BC34A),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: brownColor, width: 2),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$itemCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
         );
       },
@@ -295,12 +459,172 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${product.name} added to cart'),
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                '${product.name} تمت الإضافة للسلة',
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ],
+        ),
         backgroundColor: AppTheme.successColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 2),
       ),
     );
   }
+}
+
+// Custom Icon Widgets for Bottom Navigation
+class _HomeIcon extends StatelessWidget {
+  final bool isSelected;
+  const _HomeIcon({required this.isSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    const Color brownColor = Color(0xFF5D4037);
+    const Color greyColor = Color(0xFFBDBDBD);
+
+    return Icon(
+      isSelected ? Icons.home : Icons.home_outlined,
+      color: isSelected ? brownColor : greyColor,
+      size: 26,
+    );
+  }
+}
+
+class _MenuIcon extends StatelessWidget {
+  final bool isSelected;
+  const _MenuIcon({required this.isSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    const Color brownColor = Color(0xFF5D4037);
+    const Color greyColor = Color(0xFFBDBDBD);
+
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: isSelected ? brownColor : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(
+        Icons.menu_book,
+        color: isSelected ? Colors.white : greyColor,
+        size: 22,
+      ),
+    );
+  }
+}
+
+class _OffersIcon extends StatelessWidget {
+  final bool isSelected;
+  const _OffersIcon({required this.isSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    const Color brownColor = Color(0xFF5D4037);
+    const Color greyColor = Color(0xFFBDBDBD);
+
+    return Icon(
+      isSelected ? Icons.percent : Icons.percent_outlined,
+      color: isSelected ? brownColor : greyColor,
+      size: 26,
+    );
+  }
+}
+
+class _AccountIcon extends StatelessWidget {
+  final bool isSelected;
+  const _AccountIcon({required this.isSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    const Color brownColor = Color(0xFF5D4037);
+    const Color greyColor = Color(0xFFBDBDBD);
+
+    return Icon(
+      isSelected ? Icons.person : Icons.person_outline,
+      color: isSelected ? brownColor : greyColor,
+      size: 26,
+    );
+  }
+}
+
+class _CartIconPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+
+    // Draw bag body
+    final bagPath = Path();
+    bagPath.moveTo(size.width * 0.2, size.height * 0.35);
+    bagPath.lineTo(size.width * 0.15, size.height * 0.9);
+    bagPath.quadraticBezierTo(
+      size.width * 0.15,
+      size.height,
+      size.width * 0.25,
+      size.height,
+    );
+    bagPath.lineTo(size.width * 0.75, size.height);
+    bagPath.quadraticBezierTo(
+      size.width * 0.85,
+      size.height,
+      size.width * 0.85,
+      size.height * 0.9,
+    );
+    bagPath.lineTo(size.width * 0.8, size.height * 0.35);
+    bagPath.close();
+
+    canvas.drawPath(bagPath, paint);
+
+    // Draw handle
+    final handlePath = Path();
+    handlePath.moveTo(size.width * 0.3, size.height * 0.35);
+    handlePath.quadraticBezierTo(
+      size.width * 0.3,
+      size.height * 0.1,
+      size.width * 0.5,
+      size.height * 0.1,
+    );
+    handlePath.quadraticBezierTo(
+      size.width * 0.7,
+      size.height * 0.1,
+      size.width * 0.7,
+      size.height * 0.35,
+    );
+
+    canvas.drawPath(handlePath, paint);
+
+    // Draw smile
+    final smilePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+
+    final smilePath = Path();
+    smilePath.moveTo(size.width * 0.35, size.height * 0.6);
+    smilePath.quadraticBezierTo(
+      size.width * 0.5,
+      size.height * 0.75,
+      size.width * 0.65,
+      size.height * 0.6,
+    );
+
+    canvas.drawPath(smilePath, smilePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
