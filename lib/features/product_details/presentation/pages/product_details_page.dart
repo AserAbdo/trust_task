@@ -5,6 +5,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/back_button.dart';
+import '../../../../core/widgets/blurred_divider.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../cubit/product_details_cubit.dart';
 import '../cubit/product_details_state.dart';
@@ -299,11 +300,10 @@ class _ProductDetailsView extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Colors.grey.shade400,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade400, width: 2),
               ),
-              child: Icon(Icons.remove, color: Colors.grey.shade600, size: 24),
+              child: Icon(Icons.remove, color: Colors.black, size: 20),
             ),
           ),
 
@@ -331,7 +331,7 @@ class _ProductDetailsView extends StatelessWidget {
                 color: redColor,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.add, color: Colors.white, size: 24),
+              child: const Icon(Icons.add, color: Colors.white, size: 20),
             ),
           ),
         ],
@@ -343,7 +343,7 @@ class _ProductDetailsView extends StatelessWidget {
     return Column(
       children: [
         // Top divider with blur
-        _buildBlurredDivider(),
+        const BlurredDivider(),
         const SizedBox(height: 12),
 
         // Description text
@@ -364,29 +364,8 @@ class _ProductDetailsView extends StatelessWidget {
 
         const SizedBox(height: 12),
         // Bottom divider with blur
-        _buildBlurredDivider(),
+        const BlurredDivider(),
       ],
-    );
-  }
-
-  Widget _buildBlurredDivider() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        height: 2,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade400,
-          borderRadius: BorderRadius.circular(1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 6,
-              spreadRadius: 3,
-              offset: const Offset(0, 0),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

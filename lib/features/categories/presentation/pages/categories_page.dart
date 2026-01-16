@@ -266,7 +266,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
       child: SafeArea(
         child: Container(
           height: 75,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 1),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -363,46 +363,46 @@ class _CategoriesPageState extends State<CategoriesPage> {
           child: GestureDetector(
             onTap: _navigateToCart,
             child: Container(
-              width: 90,
-              height: 90,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: darkBrown.withValues(alpha: 0.15),
-                  width: 12,
+                  width: 14,
                 ),
               ),
               child: Center(
                 child: Container(
-                  width: 58,
-                  height: 58,
+                  width: 68,
+                  height: 68,
                   decoration: BoxDecoration(
                     color: darkBrown,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: darkBrown.withValues(alpha: 0.25),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Cart icon with smile
+                      // Shopping bag icon with face (same as product details)
                       CustomPaint(
-                        size: const Size(26, 26),
-                        painter: _CartIconPainter(),
+                        size: const Size(32, 32),
+                        painter: _ShoppingBagPainter(),
                       ),
                       if (itemCount > 0)
                         Positioned(
-                          top: 2,
-                          left: 2,
+                          top: 4,
+                          left: 4,
                           child: Container(
-                            width: 18,
-                            height: 18,
+                            width: 20,
+                            height: 20,
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
@@ -412,7 +412,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                 '$itemCount',
                                 style: const TextStyle(
                                   color: darkBrown,
-                                  fontSize: 11,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -667,7 +667,8 @@ class _AccountIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _CartIconPainter extends CustomPainter {
+// Shopping Bag Painter with face (same as product details page)
+class _ShoppingBagPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -676,64 +677,45 @@ class _CartIconPainter extends CustomPainter {
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
 
-    // Draw shopping bag body
-    final bagPath = Path();
-    bagPath.moveTo(size.width * 0.15, size.height * 0.4);
-    bagPath.lineTo(size.width * 0.1, size.height * 0.85);
-    bagPath.quadraticBezierTo(
-      size.width * 0.1,
-      size.height * 0.95,
-      size.width * 0.2,
-      size.height * 0.95,
-    );
-    bagPath.lineTo(size.width * 0.8, size.height * 0.95);
-    bagPath.quadraticBezierTo(
-      size.width * 0.9,
-      size.height * 0.95,
-      size.width * 0.9,
-      size.height * 0.85,
-    );
-    bagPath.lineTo(size.width * 0.85, size.height * 0.4);
-    bagPath.close();
+    final w = size.width;
+    final h = size.height;
 
+    // Bag body
+    final bagPath = Path();
+    bagPath.moveTo(w * 0.15, h * 0.35);
+    bagPath.lineTo(w * 0.15, h * 0.85);
+    bagPath.quadraticBezierTo(w * 0.15, h * 0.95, w * 0.25, h * 0.95);
+    bagPath.lineTo(w * 0.75, h * 0.95);
+    bagPath.quadraticBezierTo(w * 0.85, h * 0.95, w * 0.85, h * 0.85);
+    bagPath.lineTo(w * 0.85, h * 0.35);
     canvas.drawPath(bagPath, paint);
 
-    // Draw handle
+    // Bag handles
     final handlePath = Path();
-    handlePath.moveTo(size.width * 0.3, size.height * 0.4);
-    handlePath.quadraticBezierTo(
-      size.width * 0.3,
-      size.height * 0.15,
-      size.width * 0.5,
-      size.height * 0.15,
-    );
-    handlePath.quadraticBezierTo(
-      size.width * 0.7,
-      size.height * 0.15,
-      size.width * 0.7,
-      size.height * 0.4,
-    );
-
+    handlePath.moveTo(w * 0.30, h * 0.35);
+    handlePath.quadraticBezierTo(w * 0.30, h * 0.15, w * 0.50, h * 0.15);
+    handlePath.quadraticBezierTo(w * 0.70, h * 0.15, w * 0.70, h * 0.35);
     canvas.drawPath(handlePath, paint);
 
-    // Draw smile face
+    // Smile
     final smilePaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
+      ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
 
-    // Smile curve
     final smilePath = Path();
-    smilePath.moveTo(size.width * 0.35, size.height * 0.62);
-    smilePath.quadraticBezierTo(
-      size.width * 0.5,
-      size.height * 0.78,
-      size.width * 0.65,
-      size.height * 0.62,
-    );
-
+    smilePath.moveTo(w * 0.35, h * 0.60);
+    smilePath.quadraticBezierTo(w * 0.50, h * 0.75, w * 0.65, h * 0.60);
     canvas.drawPath(smilePath, smilePaint);
+
+    // Eyes
+    final eyePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(Offset(w * 0.38, h * 0.50), 2.5, eyePaint);
+    canvas.drawCircle(Offset(w * 0.62, h * 0.50), 2.5, eyePaint);
   }
 
   @override

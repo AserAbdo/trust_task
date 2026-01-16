@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/blurred_divider.dart';
 import '../../domain/entities/product_details.dart';
 
 class AddonSection extends StatelessWidget {
@@ -70,23 +71,9 @@ class AddonSection extends StatelessWidget {
 
         // Divider between addons with blur effect
         if (showDivider)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Container(
-              height: 2,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    blurRadius: 6,
-                    spreadRadius: 3,
-                    offset: const Offset(0, 0),
-                  ),
-                ],
-              ),
-            ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: BlurredDivider(horizontalPadding: 0),
           ),
       ],
     );

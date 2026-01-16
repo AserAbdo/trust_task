@@ -45,8 +45,8 @@ class CustomBackButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Arrow pointing right (arrow_back shows right arrow)
-            Icon(Icons.arrow_back, size: 30, color: iconColor),
-            const SizedBox(width: 8),
+            Icon(Icons.arrow_back, size: 26, color: iconColor),
+            const SizedBox(width: 0),
             // Arabic text "رجوع"
             Text(
               l10n.translate('back'),

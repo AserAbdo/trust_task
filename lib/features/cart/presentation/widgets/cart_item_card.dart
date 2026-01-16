@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/l10n/app_localizations.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/cart.dart';
 
 class CartItemCard extends StatelessWidget {
@@ -9,6 +8,11 @@ class CartItemCard extends StatelessWidget {
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
   final VoidCallback onRemove;
+
+  // Colors matching the design
+  static const Color linenColor = Color(0xFFFAF0E6);
+  static const Color darkBrown = Color(0xFF412216);
+  static const Color redColor = Color(0xFFCE1330);
 
   const CartItemCard({
     super.key,
@@ -23,185 +27,223 @@ class CartItemCard extends StatelessWidget {
     final l10n = context.l10n;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            _buildQuantityControls(context),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item.productName,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.right,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Column(
+        children: [
+          // Main row with image, details, and controls - RTL direction
+          Row(
+            textDirection: TextDirection.rtl,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Right side (in RTL): Product image
+              _buildProductImage(),
+              const SizedBox(width: 12),
+
+              // Middle: Product details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Product name
+                    Text(
+                      item.productName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: darkBrown,
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${item.quantity}',
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${item.itemTotal.toStringAsFixed(2)} ${l10n.translate('currency_symbol')}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppTheme.primaryColor,
-                      fontWeight: FontWeight.bold,
+                      textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.right,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  if (item.addons.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    _buildAddonsList(context, l10n),
+                    const SizedBox(height: 4),
+                    // Price
+                    Text(
+                      '${l10n.translate('currency_symbol')} ${item.itemTotal.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: darkBrown,
+                      ),
+                      textDirection: TextDirection.rtl,
+                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            _buildProductImage(),
+              const SizedBox(width: 16),
+
+              // Left side (in RTL): Quantity controls
+              _buildQuantityControls(context),
+            ],
+          ),
+
+          // Addons section (if any)
+          if (item.addons.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _buildAddonsSection(context, l10n),
           ],
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildQuantityControls(BuildContext context) {
-    return Column(
-      children: [
-        _buildControlButton(
-          icon: Icons.add,
-          onPressed: onIncrement,
-          color: AppTheme.primaryColor,
-        ),
-        const SizedBox(height: 8),
-        _buildControlButton(
-          icon: Icons.remove,
-          onPressed: item.quantity > 1 ? onDecrement : onRemove,
-          color: item.quantity > 1 ? Colors.grey : AppTheme.errorColor,
-        ),
-      ],
-    );
-  }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Delete/Trash button (pink background) - now on left
+          GestureDetector(
+            onTap: item.quantity > 1 ? onDecrement : onRemove,
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: redColor.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                item.quantity > 1 ? Icons.remove : Icons.delete_outline,
+                color: redColor,
+                size: 20,
+              ),
+            ),
+          ),
 
-  Widget _buildControlButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    required Color color,
-  }) {
-    return Material(
-      color: color.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          width: 32,
-          height: 32,
-          alignment: Alignment.center,
-          child: Icon(icon, color: color, size: 18),
-        ),
+          // Quantity
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              '${item.quantity}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: darkBrown,
+              ),
+            ),
+          ),
+
+          // Plus button (red) - now on right
+          GestureDetector(
+            onTap: onIncrement,
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: redColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.add, color: Colors.white, size: 20),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildProductImage() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: item.productImage != null
-          ? CachedNetworkImage(
-              imageUrl: item.productImage!,
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                width: 80,
-                height: 80,
-                color: Colors.grey.shade200,
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppTheme.primaryColor,
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: item.productImage != null
+            ? CachedNetworkImage(
+                imageUrl: item.productImage!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: Colors.grey.shade100,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: redColor,
+                    ),
                   ),
                 ),
-              ),
-              errorWidget: (context, url, error) => Container(
-                width: 80,
-                height: 80,
-                color: Colors.grey.shade200,
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.grey.shade100,
+                  child: const Icon(
+                    Icons.fastfood_rounded,
+                    color: Colors.grey,
+                    size: 40,
+                  ),
+                ),
+              )
+            : Container(
+                color: Colors.grey.shade100,
                 child: const Icon(
-                  Icons.shopping_bag,
-                  color: AppTheme.primaryColor,
+                  Icons.fastfood_rounded,
+                  color: Colors.grey,
                   size: 40,
                 ),
               ),
-            )
-          : Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.shopping_bag,
-                color: AppTheme.primaryColor,
-                size: 40,
-              ),
-            ),
+      ),
     );
   }
 
-  Widget _buildAddonsList(BuildContext context, AppLocalizations l10n) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 4,
-      alignment: WrapAlignment.end,
-      children: item.addons.map((addon) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(12),
+  Widget _buildAddonsSection(BuildContext context, AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        // "الاضافات" label
+        const Text(
+          'الاضافات',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: darkBrown,
           ),
-          child: Text(
-            addon.name,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
+          textDirection: TextDirection.rtl,
+        ),
+        const SizedBox(height: 8),
+        // Addons list with separators
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: _buildAddonChips(),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildAddonChips() {
+    List<Widget> chips = [];
+    for (int i = 0; i < item.addons.length; i++) {
+      chips.add(
+        Text(
+          item.addons[i].name,
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+        ),
+      );
+      // Add separator between addons
+      if (i < item.addons.length - 1) {
+        chips.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '|',
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+            ),
           ),
         );
-      }).toList(),
-    );
+      }
+    }
+    return chips;
   }
 }

@@ -17,7 +17,7 @@ class QuantitySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
@@ -54,7 +54,7 @@ class QuantitySelector extends StatelessWidget {
           decoration: BoxDecoration(
             color: onPressed != null
                 ? AppTheme.primaryColor
-                : Colors.grey.shade300,
+                : Colors.grey.shade100,
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.white, size: 20),
