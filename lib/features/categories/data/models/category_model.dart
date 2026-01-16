@@ -52,9 +52,12 @@ class ProductModel extends Product {
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
+    // Use Arabic name if available, fallback to regular name
+    String productName = json['name_ar'] ?? json['name'] ?? '';
+
     return ProductModel(
       id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      name: productName,
       description: json['description'] ?? json['short_description'] ?? '',
       image: _extractImage(json),
       price: json['price']?.toString() ?? '0',

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations.dart';
@@ -69,13 +70,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
     return Column(
       children: [
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         // Category Tabs
         _buildCategoryTabs(categories, selectedIndex, l10n),
-        const SizedBox(height: 20),
-        // Section Header
+        const SizedBox(height: 24),
+        // Section Header - Fixed title "عروض دوشكا برجر"
         _buildSectionHeader(selectedCategory, l10n),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         // Products List
         Expanded(child: _buildProductsList(selectedCategory, l10n)),
       ],
@@ -92,17 +93,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Tab 2: عروض الابلكيشن (App Offers) - on the LEFT
-          CategoryTab(
-            label: l10n.translate('app_offers'),
-            isSelected: selectedIndex == 1,
-            icon: Icons.phone_android,
-            onTap: () {
-              context.read<CategoriesCubit>().selectTab(1);
-            },
-          ),
-          const SizedBox(width: 10),
-          // Tab 1: عروض دوشكا برجر (Dushka Burger Offers) - on the RIGHT
+          // Tab 1: عروض دوشكا برجر (Dushka Burger Offers) - on the LEFT now
           CategoryTab(
             label: l10n.translate('dushka_burger_offers'),
             isSelected: selectedIndex == 0,
@@ -111,27 +102,46 @@ class _CategoriesPageState extends State<CategoriesPage> {
               context.read<CategoriesCubit>().selectTab(0);
             },
           ),
+          const SizedBox(width: 10),
+          // Tab 2: عروض الابلكيشن (App Offers) - on the RIGHT now
+          CategoryTab(
+            label: l10n.translate('app_offers'),
+            isSelected: selectedIndex == 1,
+            icon: Icons.phone_android,
+            onTap: () {
+              context.read<CategoriesCubit>().selectTab(1);
+            },
+          ),
         ],
       ),
     );
   }
 
   Widget _buildSectionHeader(Category? category, AppLocalizations l10n) {
-    if (category == null) return const SizedBox.shrink();
+    // Always show section header with category name or default Arabic text
+    String headerText = 'عروض دوشكا برجر';
+
+    if (category != null && category.name.isNotEmpty) {
+      headerText = category.name;
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Text(
-          category.name,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF424242),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            headerText,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF000000), // Pure black
+              letterSpacing: 0.3,
+            ),
+            textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
           ),
-          textAlign: TextAlign.right,
-        ),
+        ],
       ),
     );
   }
@@ -242,14 +252,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Widget _buildBottomNavBar(AppLocalizations l10n) {
     const Color darkBrown = Color(0xFF412216);
     const Color greyColor = Color(0xFF9B806E);
+    const Color linenColor = Color(0xFFFAF0E6);
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: linenColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
@@ -341,6 +352,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   Widget _buildCartFab() {
     const Color darkBrown = Color(0xFF412216);
+    const Color linenColor = Color(0xFFFAF0E6);
 
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
@@ -350,56 +362,66 @@ class _CategoriesPageState extends State<CategoriesPage> {
         }
 
         return Transform.translate(
-          offset: const Offset(0, -25),
+          offset: const Offset(0, -20),
           child: GestureDetector(
             onTap: _navigateToCart,
             child: Container(
-              width: 65,
-              height: 65,
+              width: 85,
+              height: 85,
               decoration: BoxDecoration(
-                color: darkBrown,
+                color: linenColor.withValues(alpha: 0.95),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: darkBrown.withValues(alpha: 0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
               ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Cart icon with smile
-                  CustomPaint(
-                    size: const Size(32, 32),
-                    painter: _CartIconPainter(),
+              child: Center(
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: darkBrown,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: darkBrown.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  if (itemCount > 0)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF8BC34A),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: darkBrown, width: 2),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$itemCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Cart icon with smile
+                      CustomPaint(
+                        size: const Size(28, 28),
+                        painter: _CartIconPainter(),
+                      ),
+                      if (itemCount > 0)
+                        Positioned(
+                          top: 6,
+                          left: 6,
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF8BC34A),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: darkBrown, width: 2),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$itemCount',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -530,32 +552,32 @@ class _OffersIconPainter extends CustomPainter {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.8
+      ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round;
 
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width * 0.32;
+    final radius = size.width * 0.30;
 
     // Draw main circle
     canvas.drawCircle(center, radius, paint);
 
     // Draw gear teeth (8 teeth)
     for (int i = 0; i < 8; i++) {
-      final angle = i * 3.14159 * 2 / 8;
+      final angle = i * math.pi * 2 / 8;
       final innerRadius = radius;
-      final outerRadius = radius + size.width * 0.12;
+      final outerRadius = radius + size.width * 0.10;
 
-      final x1 = center.dx + innerRadius * _cos(angle);
-      final y1 = center.dy + innerRadius * _sin(angle);
-      final x2 = center.dx + outerRadius * _cos(angle);
-      final y2 = center.dy + outerRadius * _sin(angle);
+      final x1 = center.dx + innerRadius * math.cos(angle);
+      final y1 = center.dy + innerRadius * math.sin(angle);
+      final x2 = center.dx + outerRadius * math.cos(angle);
+      final y2 = center.dy + outerRadius * math.sin(angle);
 
       canvas.drawLine(
         Offset(x1, y1),
         Offset(x2, y2),
         Paint()
           ..color = color
-          ..strokeWidth = 3
+          ..strokeWidth = 2.5
           ..strokeCap = StrokeCap.round,
       );
     }
@@ -564,39 +586,30 @@ class _OffersIconPainter extends CustomPainter {
     final percentPaint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
+      ..strokeWidth = 1.2;
 
     // Draw slash
     canvas.drawLine(
-      Offset(center.dx + radius * 0.4, center.dy - radius * 0.4),
-      Offset(center.dx - radius * 0.4, center.dy + radius * 0.4),
+      Offset(center.dx + radius * 0.35, center.dy - radius * 0.35),
+      Offset(center.dx - radius * 0.35, center.dy + radius * 0.35),
       percentPaint,
     );
 
     // Draw two small circles for %
     canvas.drawCircle(
-      Offset(center.dx - radius * 0.25, center.dy - radius * 0.25),
-      3,
+      Offset(center.dx - radius * 0.2, center.dy - radius * 0.2),
+      2.5,
       Paint()
         ..color = color
         ..style = PaintingStyle.fill,
     );
     canvas.drawCircle(
-      Offset(center.dx + radius * 0.25, center.dy + radius * 0.25),
-      3,
+      Offset(center.dx + radius * 0.2, center.dy + radius * 0.2),
+      2.5,
       Paint()
         ..color = color
         ..style = PaintingStyle.fill,
     );
-  }
-
-  double _cos(double x) {
-    // Using dart:math would be better but using Taylor series for simplicity
-    return 1 - x * x / 2 + x * x * x * x / 24;
-  }
-
-  double _sin(double x) {
-    return x - x * x * x / 6 + x * x * x * x * x / 120;
   }
 
   @override

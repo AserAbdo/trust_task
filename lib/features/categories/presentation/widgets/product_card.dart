@@ -19,14 +19,20 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
+    // Colors
+    const Color redColor = Color(0xFFCE1330);
+    const Color textDark = Color(0xFF2D2D2D);
+    const Color textGrey = Color(0xFF757575);
+    const Color cardColor = Color(0xFFFAF0E6); // Same as background linen
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: cardColor,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -39,62 +45,74 @@ class ProductCard extends StatelessWidget {
           textDirection: TextDirection.rtl,
           children: [
             // Product Image (RIGHT side in RTL)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: product.image != null && product.image!.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: product.image!,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Color(0xFF5D4037),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: product.image != null && product.image!.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: product.image!,
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0xFF412216),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        width: 80,
-                        height: 80,
+                        errorWidget: (context, url, error) => Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(
+                            Icons.fastfood_rounded,
+                            color: Colors.grey.shade400,
+                            size: 40,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: 90,
+                        height: 90,
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
-                          Icons.fastfood,
+                          Icons.fastfood_rounded,
                           color: Colors.grey.shade400,
-                          size: 35,
+                          size: 40,
                         ),
                       ),
-                    )
-                  : Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.fastfood,
-                        color: Colors.grey.shade400,
-                        size: 35,
-                      ),
-                    ),
+              ),
             ),
 
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
 
             // Product Info (CENTER)
             Expanded(
@@ -105,45 +123,62 @@ class ProductCard extends StatelessWidget {
                   Text(
                     product.name,
                     style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF424242),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: textDark,
+                      height: 1.3,
                     ),
                     textDirection: TextDirection.rtl,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${l10n.translate('currency_symbol')} ${product.price}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  const SizedBox(height: 8),
+                  Row(
                     textDirection: TextDirection.rtl,
+                    children: [
+                      Text(
+                        product.price,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: textDark,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.translate('currency_symbol'),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: textGrey,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
 
-            // Add Button (LEFT side in RTL)
+            // Add Button (LEFT side in RTL) - Smaller RED button
             GestureDetector(
               onTap: onAddToCart,
               child: Container(
                 width: 38,
                 height: 38,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFE4E1),
+                decoration: BoxDecoration(
+                  color: redColor,
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: redColor.withValues(alpha: 0.25),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.add,
-                  color: Color(0xFFE53935),
-                  size: 22,
-                ),
+                child: const Icon(Icons.add, color: Colors.white, size: 22),
               ),
             ),
           ],

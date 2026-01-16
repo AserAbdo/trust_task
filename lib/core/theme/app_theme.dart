@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Brand Colors from Design Analysis
+  // Brand Colors from Design
   static const Color primaryColor = Color(0xFFCE1330); // Red accent
   static const Color primaryLight = Color(0xFFFFE4E1); // Light pink
   static const Color primaryDark = Color(0xFFB71C1C); // Dark red
 
-  // Background Colors - Same beige for all
-  static const Color backgroundColor = Color(0xFFF5F0EB); // Beige/Cream
-  static const Color surfaceColor = Color(0xFFF5F0EB); // Same beige
+  // Background Colors - All same linen/beige #FAF0E6
+  static const Color backgroundColor = Color(0xFFFAF0E6); // Linen
+  static const Color surfaceColor = Color(0xFFFAF0E6); // Same linen
   static const Color cardColor = Colors.white;
 
   // Brown Colors
