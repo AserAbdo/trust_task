@@ -42,8 +42,8 @@ class AddonSection extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
                   color: darkBrown,
                 ),
                 textDirection: TextDirection.rtl,
@@ -53,7 +53,7 @@ class AddonSection extends StatelessWidget {
                   ' *',
                   style: TextStyle(
                     color: redColor,
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -80,8 +80,8 @@ class AddonSection extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.shade300,
-                    blurRadius: 4,
-                    spreadRadius: 1,
+                    blurRadius: 6,
+                    spreadRadius: 3,
                     offset: const Offset(0, 0),
                   ),
                 ],

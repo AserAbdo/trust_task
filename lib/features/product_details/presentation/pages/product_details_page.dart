@@ -285,7 +285,7 @@ class _ProductDetailsView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
-        color: linenColor,
+        color: Colors.grey.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -352,8 +352,8 @@ class _ProductDetailsView extends StatelessWidget {
           child: Text(
             description,
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
               color: Colors.grey.shade700,
               height: 1.6,
             ),
@@ -380,8 +380,8 @@ class _ProductDetailsView extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.grey.shade300,
-              blurRadius: 4,
-              spreadRadius: 1,
+              blurRadius: 6,
+              spreadRadius: 3,
               offset: const Offset(0, 0),
             ),
           ],
