@@ -7,6 +7,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/back_button.dart';
 import '../../../../core/widgets/blurred_divider.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../cart/presentation/cubit/cart_state.dart';
+import '../../../cart/presentation/pages/cart_page.dart';
 import '../cubit/product_details_cubit.dart';
 import '../cubit/product_details_state.dart';
 import '../widgets/addon_section.dart';
@@ -91,46 +93,67 @@ class _ProductDetailsView extends StatelessWidget {
       // Cart icon with badge on the RIGHT
       actions: [
         Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: _buildCartIconWithBadge(),
+          padding: const EdgeInsets.only(left: 16, right: 16),
+          child: _buildCartIconWithBadge(context, l10n),
         ),
       ],
     );
   }
 
-  Widget _buildCartIconWithBadge() {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        SizedBox(
-          width: 36,
-          height: 36,
-          child: CustomPaint(painter: _ShoppingBagPainter()),
-        ),
-        // Badge
-        Positioned(
-          top: -2,
-          left: -2,
+  Widget _buildCartIconWithBadge(BuildContext context, AppLocalizations l10n) {
+    return BlocBuilder<CartCubit, CartState>(
+      builder: (context, cartState) {
+        int itemCount = 0;
+        if (cartState is CartLoaded) {
+          itemCount = cartState.cart.items.length;
+        }
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CartPage()),
+            );
+          },
           child: Container(
-            width: 18,
-            height: 18,
-            decoration: const BoxDecoration(
-              color: redColor,
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Text(
-                '1',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: CustomPaint(painter: _ShoppingBagPainter()),
                 ),
-              ),
+                // Badge
+                if (itemCount > 0)
+                  Positioned(
+                    top: -2,
+                    left: -2,
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: const BoxDecoration(
+                        color: redColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$itemCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -154,7 +177,11 @@ class _ProductDetailsView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Product Name
-                _buildProductName(context, product.displayName),
+                _buildProductName(
+                  context,
+                  product.getLocalizedName(l10n.locale.languageCode),
+                  l10n,
+                ),
 
                 const SizedBox(height: 12),
 
@@ -164,8 +191,14 @@ class _ProductDetailsView extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Description
-                if (product.displayDescription.isNotEmpty)
-                  _buildDescription(context, product.displayDescription),
+                if (product
+                    .getLocalizedDescription(l10n.locale.languageCode)
+                    .isNotEmpty)
+                  _buildDescription(
+                    context,
+                    product.getLocalizedDescription(l10n.locale.languageCode),
+                    l10n,
+                  ),
 
                 // Addons Section
                 if (product.addons.isNotEmpty)
@@ -221,7 +254,11 @@ class _ProductDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildProductName(BuildContext context, String name) {
+  Widget _buildProductName(
+    BuildContext context,
+    String name,
+    AppLocalizations l10n,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text(
@@ -231,8 +268,8 @@ class _ProductDetailsView extends StatelessWidget {
           fontWeight: FontWeight.w800,
           color: darkBrown,
         ),
-        textDirection: TextDirection.rtl,
-        textAlign: TextAlign.right,
+        textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
+        textAlign: l10n.isArabic ? TextAlign.right : TextAlign.left,
       ),
     );
   }
@@ -339,7 +376,11 @@ class _ProductDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildDescription(BuildContext context, String description) {
+  Widget _buildDescription(
+    BuildContext context,
+    String description,
+    AppLocalizations l10n,
+  ) {
     return Column(
       children: [
         // Top divider with blur
@@ -357,8 +398,10 @@ class _ProductDetailsView extends StatelessWidget {
               color: Colors.grey.shade700,
               height: 1.6,
             ),
-            textDirection: TextDirection.rtl,
-            textAlign: TextAlign.right,
+            textDirection: l10n.isArabic
+                ? TextDirection.rtl
+                : TextDirection.ltr,
+            textAlign: l10n.isArabic ? TextAlign.right : TextAlign.left,
           ),
         ),
 
@@ -487,9 +530,12 @@ class _ProductDetailsView extends StatelessWidget {
     final cubit = context.read<ProductDetailsCubit>();
     final addons = cubit.getSelectedAddonsForCart();
 
+    final productName = product.getLocalizedName(l10n.locale.languageCode);
+
     context.read<CartCubit>().addToCart(
       productId: product.id,
-      productName: product.displayName,
+      productName: product.name, // English name
+      productNameAr: product.nameAr, // Arabic name
       productImage: product.images.isNotEmpty ? product.images.first : null,
       price: state.totalPrice / state.quantity,
       quantity: state.quantity,
@@ -499,14 +545,16 @@ class _ProductDetailsView extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
-          textDirection: TextDirection.rtl,
+          textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
           children: [
             const Icon(Icons.check_circle, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '${product.displayName} تمت الإضافة للسلة',
-                textDirection: TextDirection.rtl,
+                l10n.translate('added_to_cart', params: {'name': productName}),
+                textDirection: l10n.isArabic
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
               ),
             ),
           ],

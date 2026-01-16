@@ -2,10 +2,10 @@ import 'package:equatable/equatable.dart';
 
 class ProductDetails extends Equatable {
   final int id;
-  final String name;
-  final String? nameAr;
-  final String? description;
-  final String? descriptionAr;
+  final String name; // English name (name_en)
+  final String? nameAr; // Arabic name (name_ar)
+  final String? description; // English description
+  final String? descriptionAr; // Arabic description
   final String? shortDescription;
   final String price;
   final int? priceTax;
@@ -37,13 +37,19 @@ class ProductDetails extends Equatable {
     this.totalSales = 0,
   });
 
-  /// Get display name (Arabic first)
-  String get displayName =>
-      (nameAr != null && nameAr!.isNotEmpty) ? nameAr! : name;
+  /// Get localized name based on language code
+  String getLocalizedName(String languageCode) {
+    if (languageCode == 'ar' && nameAr != null && nameAr!.isNotEmpty) {
+      return nameAr!;
+    }
+    return name; // Default to English name
+  }
 
-  /// Get display description (Arabic first)
-  String get displayDescription {
-    if (descriptionAr != null && descriptionAr!.isNotEmpty) {
+  /// Get localized description based on language code
+  String getLocalizedDescription(String languageCode) {
+    if (languageCode == 'ar' &&
+        descriptionAr != null &&
+        descriptionAr!.isNotEmpty) {
       return descriptionAr!;
     }
     return description ?? '';
@@ -106,8 +112,8 @@ class ProductDetails extends Equatable {
 
 class ProductAddon extends Equatable {
   final String id;
-  final String name;
-  final String? nameAr;
+  final String name; // English name (title)
+  final String? nameAr; // Arabic name (title_ar)
   final String price;
   final bool isRequired;
   final bool isMultiChoice;
@@ -123,9 +129,13 @@ class ProductAddon extends Equatable {
     this.options = const [],
   });
 
-  /// Get display name (Arabic first)
-  String get displayName =>
-      (nameAr != null && nameAr!.isNotEmpty) ? nameAr! : name;
+  /// Get localized name based on language code
+  String getLocalizedName(String languageCode) {
+    if (languageCode == 'ar' && nameAr != null && nameAr!.isNotEmpty) {
+      return nameAr!;
+    }
+    return name; // Default to English name
+  }
 
   @override
   List<Object?> get props => [
@@ -140,8 +150,8 @@ class ProductAddon extends Equatable {
 }
 
 class AddonOption extends Equatable {
-  final String label;
-  final String? labelAr;
+  final String label; // English label
+  final String? labelAr; // Arabic label
   final String price;
   final bool isSelectedByDefault;
   final bool isEnabled;
@@ -154,9 +164,13 @@ class AddonOption extends Equatable {
     this.isEnabled = true,
   });
 
-  /// Get display label (Arabic first)
-  String get displayLabel =>
-      (labelAr != null && labelAr!.isNotEmpty) ? labelAr! : label;
+  /// Get localized label based on language code
+  String getLocalizedLabel(String languageCode) {
+    if (languageCode == 'ar' && labelAr != null && labelAr!.isNotEmpty) {
+      return labelAr!;
+    }
+    return label; // Default to English label
+  }
 
   AddonOption copyWith({bool? isSelected}) {
     return AddonOption(

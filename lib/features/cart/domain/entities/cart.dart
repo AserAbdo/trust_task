@@ -33,7 +33,8 @@ class Cart extends Equatable {
 
 class CartItem extends Equatable {
   final int productId;
-  final String productName;
+  final String productName; // English name
+  final String? productNameAr; // Arabic name
   final String? productImage;
   final double price;
   final int quantity;
@@ -42,11 +43,22 @@ class CartItem extends Equatable {
   const CartItem({
     required this.productId,
     required this.productName,
+    this.productNameAr,
     this.productImage,
     required this.price,
     required this.quantity,
     this.addons = const [],
   });
+
+  /// Get localized product name based on language code
+  String getLocalizedName(String languageCode) {
+    if (languageCode == 'ar' &&
+        productNameAr != null &&
+        productNameAr!.isNotEmpty) {
+      return productNameAr!;
+    }
+    return productName;
+  }
 
   double get itemTotal {
     double addonTotal = addons.fold(
@@ -59,6 +71,7 @@ class CartItem extends Equatable {
   CartItem copyWith({
     int? productId,
     String? productName,
+    String? productNameAr,
     String? productImage,
     double? price,
     int? quantity,
@@ -67,6 +80,7 @@ class CartItem extends Equatable {
     return CartItem(
       productId: productId ?? this.productId,
       productName: productName ?? this.productName,
+      productNameAr: productNameAr ?? this.productNameAr,
       productImage: productImage ?? this.productImage,
       price: price ?? this.price,
       quantity: quantity ?? this.quantity,
@@ -78,6 +92,7 @@ class CartItem extends Equatable {
   List<Object?> get props => [
     productId,
     productName,
+    productNameAr,
     productImage,
     price,
     quantity,
@@ -88,22 +103,29 @@ class CartItem extends Equatable {
 class CartAddon extends Equatable {
   final int id;
   final String name;
+  final String? nameAr;
   final String price;
 
-  const CartAddon({required this.id, required this.name, required this.price});
+  const CartAddon({
+    required this.id,
+    required this.name,
+    this.nameAr,
+    required this.price,
+  });
 
   factory CartAddon.fromJson(Map<String, dynamic> json) {
     return CartAddon(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
+      nameAr: json['nameAr'],
       price: json['price']?.toString() ?? '0',
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'name': name, 'price': price};
+    return {'id': id, 'name': name, 'nameAr': nameAr, 'price': price};
   }
 
   @override
-  List<Object?> get props => [id, name, price];
+  List<Object?> get props => [id, name, nameAr, price];
 }

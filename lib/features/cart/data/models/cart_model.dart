@@ -48,6 +48,7 @@ class CartItemModel extends CartItem {
   const CartItemModel({
     required super.productId,
     required super.productName,
+    super.productNameAr,
     super.productImage,
     required super.price,
     required super.quantity,
@@ -66,6 +67,8 @@ class CartItemModel extends CartItem {
       productId: json['product_id'] ?? json['productId'] ?? 0,
       productName:
           json['product_name'] ?? json['productName'] ?? json['name'] ?? '',
+      productNameAr:
+          json['product_name_ar'] ?? json['productNameAr'] ?? json['name_ar'],
       productImage:
           json['product_image'] ?? json['productImage'] ?? json['image'],
       price: double.tryParse(json['price']?.toString() ?? '0') ?? 0,
@@ -78,6 +81,7 @@ class CartItemModel extends CartItem {
     return {
       'product_id': productId,
       'product_name': productName,
+      'product_name_ar': productNameAr,
       'product_image': productImage,
       'price': price,
       'quantity': quantity,

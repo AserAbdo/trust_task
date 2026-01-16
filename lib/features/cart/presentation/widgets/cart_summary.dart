@@ -58,6 +58,7 @@ class _CartSummaryState extends State<CartSummary> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isArabic = l10n.isArabic;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -66,159 +67,180 @@ class _CartSummaryState extends State<CartSummary> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Coupon input row
-          Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              // Coupon text field with trash icon inside (right side)
-              Expanded(
-                child: Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade500, width: 1),
-                  ),
-                  child: Row(
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      // Text input
-                      Expanded(
-                        child: TextField(
-                          controller: _couponController,
-                          textAlign: TextAlign.right,
-                          textDirection: TextDirection.rtl,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: darkBrown,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: l10n.translate('enter_coupon'),
-                            hintStyle: TextStyle(
-                              color: Colors.grey.shade400,
-                              fontSize: 16,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.only(
-                              right: 20,
-                              left: 8,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Trash icon inside the input
-                      GestureDetector(
-                        onTap: () {
-                          _couponController.clear();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 16),
-                          child: Icon(
-                            Icons.delete_outline,
-                            color: Colors.grey.shade400,
-                            size: 22,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Apply button - changes color based on text
-              GestureDetector(
-                onTap: () => widget.onApplyCoupon(_couponController.text),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _hasCouponText
-                        ? redColor // Red when has text (same as checkout)
-                        : const Color(0xFFE8D5D0), // Beige when empty
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    l10n.translate('apply'),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: _hasCouponText ? Colors.white : darkBrown,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _buildCouponRow(l10n, isArabic),
 
           const SizedBox(height: 24),
 
           // Payment details section
-          Container(
-            padding: const EdgeInsets.all(20),
+          _buildPaymentDetailsSection(l10n, isArabic),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCouponRow(AppLocalizations l10n, bool isArabic) {
+    return Row(
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+      children: [
+        // Coupon text field with trash icon inside
+        Expanded(
+          child: Container(
+            height: 52,
             decoration: BoxDecoration(
-              color: linenColor,
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.shade400, width: 1.5),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            child: Row(
+              textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
               children: [
-                // Title - aligned to right
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'تفاصيل الدفع',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: darkBrown,
+                // Text input
+                Expanded(
+                  child: TextField(
+                    controller: _couponController,
+                    textAlign: isArabic ? TextAlign.right : TextAlign.left,
+                    textDirection: isArabic
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
+                    style: const TextStyle(fontSize: 16, color: darkBrown),
+                    decoration: InputDecoration(
+                      hintText: l10n.translate('enter_coupon'),
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 15,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.only(
+                        right: isArabic ? 20 : 8,
+                        left: isArabic ? 8 : 20,
+                      ),
                     ),
-                    textDirection: TextDirection.rtl,
                   ),
                 ),
-                const SizedBox(height: 16),
-
-                // Blurred divider
-                const BlurredDivider(horizontalPadding: 0),
-                const SizedBox(height: 16),
-
-                // Subtotal row
-                _buildSummaryRow(
-                  context,
-                  l10n.translate('subtotal'),
-                  '${l10n.translate('currency_symbol')} ${widget.subtotal.toStringAsFixed(2)}',
-                ),
-                const SizedBox(height: 8),
-
-                // Dashed divider
-                _buildDashedDivider(),
-                const SizedBox(height: 8),
-
-                // Tax row
-                _buildSummaryRow(
-                  context,
-                  l10n.translate('tax'),
-                  '${l10n.translate('currency_symbol')} ${widget.tax.toStringAsFixed(2)}',
-                ),
-                const SizedBox(height: 8),
-
-                // Dashed divider
-                _buildDashedDivider(),
-                const SizedBox(height: 8),
-
-                // Total row (bold and larger)
-                _buildSummaryRow(
-                  context,
-                  l10n.translate('total_amount'),
-                  '${l10n.translate('currency_symbol')} ${widget.total.toStringAsFixed(2)}',
-                  isTotal: true,
+                // Trash icon inside the input
+                GestureDetector(
+                  onTap: () {
+                    _couponController.clear();
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: isArabic ? 16 : 0,
+                      right: isArabic ? 0 : 16,
+                    ),
+                    child: Icon(
+                      Icons.delete_outline,
+                      color: Colors.grey.shade400,
+                      size: 22,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
+        ),
+        const SizedBox(width: 12),
+        // Apply button - changes color based on text
+        GestureDetector(
+          onTap: () => widget.onApplyCoupon(_couponController.text),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            decoration: BoxDecoration(
+              color: _hasCouponText
+                  ? redColor // Red when has text (same as checkout)
+                  : const Color(0xFFE8D5D0), // Beige when empty
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              l10n.translate('apply'),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: _hasCouponText ? Colors.white : darkBrown,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentDetailsSection(AppLocalizations l10n, bool isArabic) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: linenColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: isArabic
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          // Title - aligned based on language
+          Align(
+            alignment: isArabic ? Alignment.centerRight : Alignment.centerLeft,
+            child: Text(
+              l10n.translate('payment_details'),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: darkBrown,
+              ),
+              textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Blurred divider
+          const BlurredDivider(horizontalPadding: 0),
+          const SizedBox(height: 16),
+
+          // Subtotal row
+          _buildSummaryRow(
+            l10n.translate('subtotal'),
+            _formatPrice(widget.subtotal, l10n),
+            isArabic,
+          ),
+          const SizedBox(height: 8),
+
+          // Dashed divider
+          _buildDashedDivider(),
+          const SizedBox(height: 8),
+
+          // Tax row
+          _buildSummaryRow(
+            l10n.translate('tax'),
+            _formatPrice(widget.tax, l10n),
+            isArabic,
+          ),
+          const SizedBox(height: 8),
+
+          // Dashed divider
+          _buildDashedDivider(),
+          const SizedBox(height: 8),
+
+          // Total row (bold and larger)
+          _buildSummaryRow(
+            l10n.translate('total_amount'),
+            _formatPrice(widget.total, l10n),
+            isArabic,
+            isTotal: true,
+          ),
         ],
       ),
     );
+  }
+
+  String _formatPrice(double price, AppLocalizations l10n) {
+    final currencySymbol = l10n.translate('currency_symbol');
+    final formattedPrice = price.toStringAsFixed(2);
+
+    // For Arabic, currency comes after. For English, currency comes before.
+    if (l10n.isArabic) {
+      return '$formattedPrice $currencySymbol';
+    } else {
+      return '$currencySymbol $formattedPrice';
+    }
   }
 
   /// Builds a dashed divider line
@@ -245,16 +267,16 @@ class _CartSummaryState extends State<CartSummary> {
   }
 
   Widget _buildSummaryRow(
-    BuildContext context,
     String label,
-    String value, {
+    String value,
+    bool isArabic, {
     bool isTotal = false,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      textDirection: TextDirection.rtl,
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
       children: [
-        // Label (right side in RTL)
+        // Label
         Text(
           label,
           style: TextStyle(
@@ -262,9 +284,9 @@ class _CartSummaryState extends State<CartSummary> {
             fontWeight: isTotal ? FontWeight.w800 : FontWeight.w600,
             color: isTotal ? darkBrown : Colors.grey.shade600,
           ),
-          textDirection: TextDirection.rtl,
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         ),
-        // Value (left side in RTL)
+        // Value
         Text(
           value,
           style: TextStyle(
@@ -272,7 +294,7 @@ class _CartSummaryState extends State<CartSummary> {
             fontWeight: isTotal ? FontWeight.w800 : FontWeight.w600,
             color: isTotal ? redColor : darkBrown,
           ),
-          textDirection: TextDirection.rtl,
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         ),
       ],
     );

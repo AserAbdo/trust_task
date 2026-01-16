@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/widgets/blurred_divider.dart';
 import '../../domain/entities/product_details.dart';
 
@@ -24,8 +25,11 @@ class AddonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use Arabic name if available, otherwise use the English name
-    final title = addon.displayName;
+    final l10n = context.l10n;
+    final languageCode = l10n.locale.languageCode;
+
+    // Use localized name based on current language
+    final title = addon.getLocalizedName(languageCode);
 
     // Radio if not multi-choice
     final isRadio = !addon.isMultiChoice;
@@ -33,12 +37,16 @@ class AddonSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Section Title - RTL aligned, large and bold
+        // Section Title - aligned based on language direction
         Align(
-          alignment: Alignment.centerRight,
+          alignment: l10n.isArabic
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            textDirection: TextDirection.rtl,
+            textDirection: l10n.isArabic
+                ? TextDirection.rtl
+                : TextDirection.ltr,
             children: [
               Text(
                 title,
@@ -47,7 +55,9 @@ class AddonSection extends StatelessWidget {
                   fontWeight: FontWeight.w900,
                   color: darkBrown,
                 ),
-                textDirection: TextDirection.rtl,
+                textDirection: l10n.isArabic
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
               ),
               if (addon.isRequired)
                 const Text(
@@ -66,7 +76,7 @@ class AddonSection extends StatelessWidget {
         // Options List
         ...addon.options.map((option) {
           final isSelected = selectedOptions.contains(option.label);
-          return _buildOptionTile(context, option, isSelected, isRadio);
+          return _buildOptionTile(context, option, isSelected, isRadio, l10n);
         }),
 
         // Divider between addons with blur effect
@@ -84,16 +94,17 @@ class AddonSection extends StatelessWidget {
     AddonOption option,
     bool isSelected,
     bool isRadio,
+    AppLocalizations l10n,
   ) {
-    // Use Arabic label if available
-    final displayLabel = option.displayLabel;
+    // Use localized label based on current language
+    final displayLabel = option.getLocalizedLabel(l10n.locale.languageCode);
 
     return InkWell(
       onTap: () => onOptionToggle(option.label, isRadio),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
-          textDirection: TextDirection.rtl,
+          textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
           children: [
             // Radio/Checkbox
             Container(
@@ -134,7 +145,9 @@ class AddonSection extends StatelessWidget {
               child: Text(
                 displayLabel,
                 style: TextStyle(fontSize: 17, color: Colors.grey.shade700),
-                textDirection: TextDirection.rtl,
+                textDirection: l10n.isArabic
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
               ),
             ),
 

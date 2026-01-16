@@ -123,7 +123,9 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         if (selectedLabels.contains(option.label)) {
           addons.add({
             'id': addon.id,
-            'name': option.displayLabel, // Use Arabic label
+            'name': option.label, // Use English label as identifier
+            'nameAr':
+                option.labelAr ?? option.label, // Include Arabic for display
             'price': option.price,
           });
         }

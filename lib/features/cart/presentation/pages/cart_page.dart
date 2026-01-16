@@ -122,7 +122,9 @@ class _CartPageState extends State<CartPage> {
               context.read<CartCubit>().applyCoupon(code);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('تم تطبيق الكوبون "$code"'),
+                  content: Text(
+                    l10n.translate('coupon_applied', params: {'code': code}),
+                  ),
                   backgroundColor: Colors.green,
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -147,8 +149,8 @@ class _CartPageState extends State<CartPage> {
           child: ElevatedButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('جاري الانتقال للدفع...'),
+                SnackBar(
+                  content: Text(l10n.translate('proceeding_to_checkout')),
                   backgroundColor: redColor,
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -272,26 +274,37 @@ class _CartPageState extends State<CartPage> {
   }
 
   void _showRemoveDialog(int productId, String productName) {
+    final l10n = context.l10n;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('حذف المنتج', textDirection: TextDirection.rtl),
+        title: Text(
+          l10n.translate('remove_product'),
+          textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
+        ),
         content: Text(
-          'هل تريد حذف "$productName" من السلة؟',
-          textDirection: TextDirection.rtl,
+          l10n.translate(
+            'remove_product_confirm',
+            params: {'name': productName},
+          ),
+          textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.translate('cancel')),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              this.context.read<CartCubit>().removeFromCart(productId);
+              Navigator.pop(dialogContext);
+              context.read<CartCubit>().removeFromCart(productId);
             },
-            child: const Text('حذف', style: TextStyle(color: redColor)),
+            child: Text(
+              l10n.translate('delete'),
+              style: const TextStyle(color: redColor),
+            ),
           ),
         ],
       ),

@@ -118,15 +118,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Widget _buildSectionHeader(Category? category, AppLocalizations l10n) {
-    // Always show section header with category name or default Arabic text
-    String headerText = 'عروض دوشكا برجر';
+    // Use localized category name based on current language
+    String headerText = l10n.translate('dushka_burger_offers');
 
     if (category != null && category.name.isNotEmpty) {
-      headerText = category.name;
+      headerText = category.getLocalizedName(l10n.locale.languageCode);
     }
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Align(
@@ -456,9 +456,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   void _addToCart(Product product) {
+    final l10n = context.l10n;
+    final productName = product.getLocalizedName(l10n.locale.languageCode);
+
     context.read<CartCubit>().addToCart(
       productId: product.id,
-      productName: product.name,
+      productName:
+          product.nameEn ??
+          product.name, // English name (nameEn) or fallback to name
+      productNameAr: product.name, // Arabic name (name is Arabic by default)
       productImage: product.image,
       price: double.tryParse(product.price) ?? 0,
       quantity: 1,
@@ -467,13 +473,16 @@ class _CategoriesPageState extends State<CategoriesPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
+          textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
           children: [
             const Icon(Icons.check_circle, color: Colors.white),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                '${product.name} تمت الإضافة للسلة',
-                textDirection: TextDirection.rtl,
+                l10n.translate('added_to_cart', params: {'name': productName}),
+                textDirection: l10n.isArabic
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
               ),
             ),
           ],

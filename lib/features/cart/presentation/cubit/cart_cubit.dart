@@ -51,6 +51,7 @@ class CartCubit extends Cubit<CartState> {
   Future<void> addToCart({
     required int productId,
     required String productName,
+    String? productNameAr,
     String? productImage,
     required double price,
     required int quantity,
@@ -75,6 +76,7 @@ class CartCubit extends Cubit<CartState> {
         CartItemModel(
           productId: productId,
           productName: productName,
+          productNameAr: productNameAr,
           productImage: productImage,
           price: price,
           quantity: quantity,

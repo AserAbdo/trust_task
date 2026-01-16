@@ -443,7 +443,7 @@ class _LanguageSettingTile extends StatelessWidget {
   }
 }
 
-/// Custom Language Toggle Button
+/// Creative Language Toggle with Flag Design
 class _LanguageToggle extends StatelessWidget {
   final bool isArabic;
 
@@ -456,52 +456,111 @@ class _LanguageToggle extends StatelessWidget {
         context.read<LanguageCubit>().toggleLanguage();
       },
       child: Container(
-        width: 80,
-        height: 36,
+        width: 100,
+        height: 44,
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [Colors.grey.shade200, Colors.grey.shade50],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Stack(
           children: [
+            // Animated Pill Selector
             AnimatedAlign(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
               alignment: isArabic
                   ? Alignment.centerRight
                   : Alignment.centerLeft,
               child: Container(
-                width: 40,
-                height: 32,
-                margin: const EdgeInsets.symmetric(horizontal: 2),
+                width: 46,
+                height: 36,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor,
-                  borderRadius: BorderRadius.circular(18),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.primaryColor,
+                      AppTheme.primaryColor.withValues(alpha: 0.85),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'EN',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: !isArabic ? Colors.white : Colors.grey.shade600,
+            // Language Options Row - Always LTR to keep EN on left, ع on right
+            Directionality(
+              textDirection: TextDirection.ltr,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // English Option (always on left)
+                  _buildLanguageOption(
+                    flag: '🇬🇧',
+                    label: 'EN',
+                    isSelected: !isArabic,
                   ),
-                ),
-                Text(
-                  'ع',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: isArabic ? Colors.white : Colors.grey.shade600,
+                  // Arabic Option (always on right)
+                  _buildLanguageOption(
+                    flag: '🇸🇦',
+                    label: 'ع',
+                    isSelected: isArabic,
+                    isArabicFont: true,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required String flag,
+    required String label,
+    required bool isSelected,
+    bool isArabicFont = false,
+  }) {
+    return AnimatedDefaultTextStyle(
+      duration: const Duration(milliseconds: 200),
+      style: TextStyle(
+        fontSize: isArabicFont ? 16 : 13,
+        fontWeight: FontWeight.w800,
+        color: isSelected ? Colors.white : Colors.grey.shade500,
+        shadows: isSelected
+            ? [
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  offset: const Offset(0, 1),
+                  blurRadius: 2,
+                ),
+              ]
+            : null,
+      ),
+      child: SizedBox(
+        width: 40,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Text(label)],
         ),
       ),
     );

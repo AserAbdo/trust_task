@@ -44,7 +44,7 @@ class ProductCard extends StatelessWidget {
           ],
         ),
         child: Row(
-          textDirection: TextDirection.rtl,
+          textDirection: l10n.isArabic ? TextDirection.rtl : TextDirection.ltr,
           children: [
             // Product Image (RIGHT side in RTL)
             Container(
@@ -123,20 +123,24 @@ class ProductCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    product.name,
+                    product.getLocalizedName(l10n.locale.languageCode),
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                       color: textDark,
                       height: 1.3,
                     ),
-                    textDirection: TextDirection.rtl,
+                    textDirection: l10n.isArabic
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
                   Row(
-                    textDirection: TextDirection.rtl,
+                    textDirection: l10n.isArabic
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
                     children: [
                       Text(
                         formattedPrice,

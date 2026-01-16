@@ -25,55 +25,62 @@ class CartItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isArabic = l10n.isArabic;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Column(
         children: [
-          // Main row with image, details, and controls - RTL direction
+          // Main row with image, details, and controls
           Row(
-            textDirection: TextDirection.rtl,
+            textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Right side (in RTL): Product image
+              // Product image
               _buildProductImage(),
               const SizedBox(width: 12),
 
               // Middle: Product details
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: isArabic
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
                     // Product name
                     Text(
-                      item.productName,
+                      item.getLocalizedName(l10n.locale.languageCode),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: darkBrown,
                       ),
-                      textDirection: TextDirection.rtl,
-                      textAlign: TextAlign.right,
+                      textDirection: isArabic
+                          ? TextDirection.rtl
+                          : TextDirection.ltr,
+                      textAlign: isArabic ? TextAlign.right : TextAlign.left,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     // Price
                     Text(
-                      '${l10n.translate('currency_symbol')} ${item.itemTotal.toStringAsFixed(2)}',
+                      _formatPrice(item.itemTotal, l10n),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: darkBrown,
                       ),
-                      textDirection: TextDirection.rtl,
+                      textDirection: isArabic
+                          ? TextDirection.rtl
+                          : TextDirection.ltr,
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 16),
 
-              // Left side (in RTL): Quantity controls
+              // Quantity controls
               _buildQuantityControls(context),
             ],
           ),
@@ -81,11 +88,22 @@ class CartItemCard extends StatelessWidget {
           // Addons section (if any)
           if (item.addons.isNotEmpty) ...[
             const SizedBox(height: 12),
-            _buildAddonsSection(context, l10n),
+            _buildAddonsSection(context, l10n, isArabic),
           ],
         ],
       ),
     );
+  }
+
+  String _formatPrice(double price, AppLocalizations l10n) {
+    final currencySymbol = l10n.translate('currency_symbol');
+    final formattedPrice = price.toStringAsFixed(2);
+
+    if (l10n.isArabic) {
+      return '$formattedPrice $currencySymbol';
+    } else {
+      return '$currencySymbol $formattedPrice';
+    }
   }
 
   Widget _buildQuantityControls(BuildContext context) {
@@ -98,7 +116,7 @@ class CartItemCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Delete/Trash button (pink background) - now on left
+          // Decrease/Delete button
           GestureDetector(
             onTap: item.quantity > 1 ? onDecrement : onRemove,
             child: Container(
@@ -129,7 +147,7 @@ class CartItemCard extends StatelessWidget {
             ),
           ),
 
-          // Plus button (red) - now on right
+          // Plus button
           GestureDetector(
             onTap: onIncrement,
             child: Container(
@@ -198,36 +216,49 @@ class CartItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAddonsSection(BuildContext context, AppLocalizations l10n) {
+  Widget _buildAddonsSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isArabic,
+  ) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: isArabic
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
-        // "الاضافات" label
-        const Text(
-          'الاضافات',
-          style: TextStyle(
+        // Addons label
+        Text(
+          l10n.translate('addons'),
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: darkBrown,
           ),
-          textDirection: TextDirection.rtl,
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
         ),
         const SizedBox(height: 8),
         // Addons list with separators
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: _buildAddonChips(),
+          mainAxisAlignment: isArabic
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
+          children: _buildAddonChips(isArabic),
         ),
       ],
     );
   }
 
-  List<Widget> _buildAddonChips() {
+  List<Widget> _buildAddonChips(bool isArabic) {
     List<Widget> chips = [];
     for (int i = 0; i < item.addons.length; i++) {
+      // Use Arabic name if available and in Arabic mode
+      final addonName = isArabic
+          ? (item.addons[i].nameAr ?? item.addons[i].name)
+          : item.addons[i].name;
+
       chips.add(
         Text(
-          item.addons[i].name,
+          addonName,
           style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
         ),
       );

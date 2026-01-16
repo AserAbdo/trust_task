@@ -19,6 +19,14 @@ class Category extends Equatable {
     this.products = const [],
   });
 
+  /// Get localized name based on language code
+  String getLocalizedName(String languageCode) {
+    if (languageCode == 'en' && nameEn != null && nameEn!.isNotEmpty) {
+      return nameEn!;
+    }
+    return name;
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -33,10 +41,10 @@ class Category extends Equatable {
 
 class Product extends Equatable {
   final int id;
-  final String name;
-  final String? nameEn;
-  final String? description;
-  final String? descriptionAr;
+  final String name; // Arabic name (name_ar)
+  final String? nameEn; // English name (name_en)
+  final String? description; // English description
+  final String? descriptionAr; // Arabic description
   final String? image;
   final String price;
   final int? priceTax;
@@ -62,6 +70,24 @@ class Product extends Equatable {
     this.totalSales = 0,
   });
 
+  /// Get localized name based on language code
+  String getLocalizedName(String languageCode) {
+    if (languageCode == 'en' && nameEn != null && nameEn!.isNotEmpty) {
+      return nameEn!;
+    }
+    return name; // Default to Arabic name
+  }
+
+  /// Get localized description based on language code
+  String getLocalizedDescription(String languageCode) {
+    if (languageCode == 'ar' &&
+        descriptionAr != null &&
+        descriptionAr!.isNotEmpty) {
+      return descriptionAr!;
+    }
+    return description ?? '';
+  }
+
   /// Get the display price (prefer price_tax as integer)
   String get displayPrice {
     if (priceTax != null && priceTax! > 0) {
@@ -73,14 +99,6 @@ class Product extends Equatable {
       return priceValue.toInt().toString();
     }
     return price;
-  }
-
-  /// Get Arabic description or fallback to English
-  String get displayDescription {
-    if (descriptionAr != null && descriptionAr!.isNotEmpty) {
-      return descriptionAr!;
-    }
-    return description ?? '';
   }
 
   @override
