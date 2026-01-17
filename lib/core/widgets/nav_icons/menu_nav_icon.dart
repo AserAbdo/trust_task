@@ -11,22 +11,24 @@ class MenuNavIcon extends StatelessWidget {
     const Color darkBrown = Color(0xFF412216);
     const Color greyColor = Color(0xFF9B806E);
 
-    // Fixed size container to prevent movement
+    // Fixed size container to prevent any movement
     return SizedBox(
-      width: 36,
-      height: 36,
+      width: 40,
+      height: 40,
       child: Center(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: EdgeInsets.all(isSelected ? 6 : 0),
+        child: Container(
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             color: isSelected ? darkBrown : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
-            isSelected ? Icons.menu_book_rounded : Icons.menu_book_outlined,
-            color: isSelected ? Colors.white : greyColor,
-            size: isSelected ? 20 : 24,
+          child: Center(
+            child: Icon(
+              Icons.menu_book_rounded,
+              color: isSelected ? Colors.white : greyColor,
+              size: 22,
+            ),
           ),
         ),
       ),

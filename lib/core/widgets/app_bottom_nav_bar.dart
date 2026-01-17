@@ -221,12 +221,22 @@ class _CartFab extends StatelessWidget {
                   width: AppBottomNavBar._cartFabOuterSize,
                   height: AppBottomNavBar._cartFabOuterSize,
                   decoration: BoxDecoration(
-                    color: Colors.transparent,
+                    // Gradient-like shadow ring around the button
+                    color: AppBottomNavBar.darkBrown.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppBottomNavBar.darkBrown.withValues(alpha: 0.10),
-                      width: 10, // Thicker border for bigger FAB
+                      color: AppBottomNavBar.darkBrown.withValues(alpha: 0.18),
+                      width: 12,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppBottomNavBar.darkBrown.withValues(
+                          alpha: 0.15,
+                        ),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Container(
