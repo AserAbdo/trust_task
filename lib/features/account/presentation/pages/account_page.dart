@@ -4,10 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/cubit/language_cubit.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_bottom_nav_bar.dart';
 
 /// Account Page - User profile, settings, and app information
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
+
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  int _currentNavIndex = 4; // Account tab is index 4
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +39,16 @@ class AccountPage extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: AppBottomNavBar(
+        currentIndex: _currentNavIndex,
+        onIndexChanged: (index) {
+          if (index != 4) {
+            // Navigate back and let the main page handle navigation
+            Navigator.pop(context);
+          }
+          setState(() => _currentNavIndex = index);
+        },
+      ),
     );
   }
 
@@ -42,10 +60,8 @@ class AccountPage extends StatelessWidget {
       backgroundColor: AppTheme.backgroundColor,
       elevation: 0,
       centerTitle: true,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: AppTheme.brownPrimary),
-        onPressed: () => Navigator.pop(context),
-      ),
+      automaticallyImplyLeading:
+          false, // Remove back button since we have nav bar
       title: Text(
         l10n.translate('account'),
         style: const TextStyle(
@@ -93,14 +109,9 @@ class _ProfileSection extends StatelessWidget {
                 ],
               ),
             ),
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 3),
-              ),
+            child: CircleAvatar(
+              radius: 40,
+              backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
               child: const Icon(
                 Icons.person_rounded,
                 size: 40,

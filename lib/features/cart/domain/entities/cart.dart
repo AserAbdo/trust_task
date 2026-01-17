@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../../core/constants/app_constants.dart';
 
 class Cart extends Equatable {
   final List<CartItem> items;
@@ -14,10 +15,10 @@ class Cart extends Equatable {
   });
 
   /// Factory constructor to create Cart from items list
-  /// Automatically calculates subtotal, tax, and total
+  /// Automatically calculates subtotal, tax, and total using configurable tax rate
   factory Cart.fromItems(List<CartItem> items) {
     final subtotal = items.fold<double>(0, (sum, item) => sum + item.itemTotal);
-    final tax = subtotal * 0.14; // 14% tax
+    final tax = subtotal * AppConstants.taxRate;
     final total = subtotal + tax;
 
     return Cart(items: items, subtotal: subtotal, tax: tax, total: total);
@@ -124,8 +125,16 @@ class CartAddon extends Equatable {
   });
 
   factory CartAddon.fromJson(Map<String, dynamic> json) {
+    // Handle id as either int or String from JSON
+    int parsedId = 0;
+    if (json['id'] != null) {
+      parsedId = json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id'].toString()) ?? 0;
+    }
+
     return CartAddon(
-      id: json['id'] ?? 0,
+      id: parsedId,
       name: json['name'] ?? '',
       nameAr: json['nameAr'],
       price: json['price']?.toString() ?? '0',
