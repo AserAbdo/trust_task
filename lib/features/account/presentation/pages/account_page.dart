@@ -97,27 +97,11 @@ class _ProfileSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Avatar with gradient border
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primaryColor,
-                  AppTheme.primaryColor.withValues(alpha: 0.6),
-                ],
-              ),
-            ),
-            child: CircleAvatar(
-              radius: 40,
-              backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
-              child: const Icon(
-                Icons.person_rounded,
-                size: 40,
-                color: AppTheme.primaryColor,
-              ),
-            ),
+          // Profile Avatar
+          const CircleAvatar(
+            radius: 45,
+            backgroundColor: Color(0xFFE8E0D8),
+            child: Icon(Icons.person, size: 50, color: Color(0xFF8B7355)),
           ),
           const SizedBox(height: 16),
 

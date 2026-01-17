@@ -38,10 +38,10 @@ class AppBottomNavBar extends StatelessWidget {
 
   // Fixed dimensions to prevent icon movement
   static const double _navBarHeight = 85.0;
-  static const double _navItemWidth = 50.0;
+  static const double _navItemWidth = 40.0;
   static const double _iconSize = 24.0;
   static const double _cartFabSize = 76.0; // Bigger cart button
-  static const double _cartFabOuterSize = 105.0; // Bigger outer ring
+  static const double _cartFabOuterSize = 100.0; // Bigger outer ring
 
   const AppBottomNavBar({
     super.key,
@@ -171,15 +171,15 @@ class _NavItem extends StatelessWidget {
             const SizedBox(height: 4),
             // Fixed height for text to prevent layout shift
             SizedBox(
-              height: 14,
+              height: 15,
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   color: isSelected
                       ? AppBottomNavBar.darkBrown
                       : AppBottomNavBar.greyColor,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontWeight: FontWeight.w700,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
@@ -228,15 +228,7 @@ class _CartFab extends StatelessWidget {
                       color: AppBottomNavBar.darkBrown.withValues(alpha: 0.18),
                       width: 12,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppBottomNavBar.darkBrown.withValues(
-                          alpha: 0.15,
-                        ),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                    ],
+                    boxShadow: [],
                   ),
                   child: Center(
                     child: Container(
@@ -245,16 +237,7 @@ class _CartFab extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppBottomNavBar.darkBrown,
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppBottomNavBar.darkBrown.withValues(
-                              alpha: 0.40,
-                            ),
-                            blurRadius: 24, // Increased blur for softer spread
-                            spreadRadius: 8, // Wider shadow spread
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
+                        boxShadow: [],
                       ),
                       child: Stack(
                         alignment: Alignment.center,
