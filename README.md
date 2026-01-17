@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="screenshots/banner.jpg" alt="Dushka Burger Logo" height="120"/>
+</p>
+
 # 🍔 Dushka Burger - Flutter Food Ordering App
 
 A professional Flutter food ordering application built with **Clean Architecture** and **Cubit** state management. This app demonstrates best practices in Flutter development including proper separation of concerns, dependency injection, and comprehensive error handling.
@@ -10,10 +14,6 @@ A professional Flutter food ordering application built with **Clean Architecture
 ---
 
 ## 📱 Screenshots
-
-<p align="center">
-  <img src="screenshots/banner.jpg" alt="Dushka Burger Banner" height="120"/>
-</p>
 
 <p align="center">
   <img src="screenshots/home.png" alt="Home Screen" width="180" height="380"/>
