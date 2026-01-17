@@ -67,7 +67,7 @@ class _CartPageState extends State<CartPage> {
       elevation: 0,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      leadingWidth: 140,
+      leadingWidth: 100,
       leading: Padding(
         padding: const EdgeInsets.only(left: 12),
         child: Center(

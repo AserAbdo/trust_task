@@ -63,17 +63,50 @@ class CartItemCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    // Price
-                    Text(
-                      _formatPrice(item.itemTotal, l10n),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: darkBrown,
-                      ),
-                      textDirection: isArabic
-                          ? TextDirection.rtl
-                          : TextDirection.ltr,
+                    // Price with proper RTL/LTR
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: isArabic
+                          ? [
+                              // Arabic: number first, then currency
+                              Text(
+                                item.itemTotal.toStringAsFixed(2),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: darkBrown,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                l10n.translate('currency_symbol'),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: darkBrown,
+                                ),
+                              ),
+                            ]
+                          : [
+                              // English: currency first, then number
+                              Text(
+                                l10n.translate('currency_symbol'),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: darkBrown,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                item.itemTotal.toStringAsFixed(2),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: darkBrown,
+                                ),
+                              ),
+                            ],
                     ),
                   ],
                 ),
@@ -93,17 +126,6 @@ class CartItemCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatPrice(double price, AppLocalizations l10n) {
-    final currencySymbol = l10n.translate('currency_symbol');
-    final formattedPrice = price.toStringAsFixed(2);
-
-    if (l10n.isArabic) {
-      return '$formattedPrice $currencySymbol';
-    } else {
-      return '$currencySymbol $formattedPrice';
-    }
   }
 
   Widget _buildQuantityControls(BuildContext context) {

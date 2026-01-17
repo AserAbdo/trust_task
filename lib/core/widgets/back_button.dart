@@ -25,7 +25,7 @@ class CustomBackButton extends StatelessWidget {
     this.textColor = const Color(0xFF4A4A4A),
     this.iconColor = const Color(0xFF4A4A4A),
     this.backgroundColor = Colors.transparent,
-    this.borderColor = const Color(0xFFD0D0D0),
+    this.borderColor = const Color(0xFF5B5A5A),
   });
 
   @override

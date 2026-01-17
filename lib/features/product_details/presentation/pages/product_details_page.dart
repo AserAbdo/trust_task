@@ -74,7 +74,7 @@ class _ProductDetailsView extends StatelessWidget {
       elevation: 0,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      leadingWidth: 140,
+      leadingWidth: 100,
       // Back button on the LEFT
       leading: Padding(
         padding: const EdgeInsets.only(left: 12),
