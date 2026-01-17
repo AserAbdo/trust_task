@@ -143,7 +143,6 @@ class _CategoriesContent extends StatelessWidget {
         _CategoryTabs(categories: categories, selectedIndex: selectedIndex),
         const SizedBox(height: 24),
         _SectionHeader(category: selectedCategory),
-        const SizedBox(height: 16),
         Expanded(
           child: _ProductsList(
             category: selectedCategory,
