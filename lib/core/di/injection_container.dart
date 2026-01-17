@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../cubit/language_cubit.dart';
 import '../network/api_client.dart';
 import '../network/network_info.dart';
+import '../security/secure_credentials_manager.dart';
 import '../utils/guest_manager.dart';
 
 // Categories feature
@@ -52,6 +53,9 @@ Future<void> _initExternalDependencies() async {
 
 /// Initialize core dependencies (API client, network info, etc.)
 void _initCoreDependencies() {
+  // Security
+  sl.registerLazySingleton(() => SecureCredentialsManager());
+
   // Network
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl());
   sl.registerLazySingleton(() => ApiClient());

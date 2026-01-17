@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'core/constants/env_config.dart';
 import 'core/cubit/language_cubit.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/l10n/app_localizations.dart';
@@ -12,7 +13,13 @@ import 'features/cart/presentation/cubit/cart_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize secure credentials before DI
+  await EnvConfig.initialize();
+
+  // Initialize dependency injection
   await di.init();
+
   runApp(const MyApp());
 }
 
