@@ -11,18 +11,24 @@ A professional Flutter food ordering application built with **Clean Architecture
 
 ## 📱 Screenshots
 
-| Categories Screen | Product Details | Cart Screen |
-|:---:|:---:|:---:|
-| Browse categories and products | View details with addons | Manage your cart |
+<p align="center">
+  <img src="screenshots/banner.jpg" alt="Dushka Burger Banner" width="100%"/>
+</p>
+
+| Home Screen | Product Details | Cart Screen | Account Screen |
+|:---:|:---:|:---:|:---:|
+| <img src="screenshots/home.png" width="200"/> | <img src="screenshots/product-details.png" width="200"/> | <img src="screenshots/cart.png" width="200"/> | <img src="screenshots/account.png" width="200"/> |
+| Browse categories and products | View details with addons | Manage your cart | User profile & settings |
 
 ---
 
 ## ✨ Features
 
 ### Screens Implemented
-- **📋 Categories Screen** - Browse food categories with products listing
+- **🏠 Home Screen** - Browse food categories with products listing and custom bottom navigation
 - **🍕 Product Details Screen** - View product info, select addons, adjust quantity
 - **🛒 Cart Screen** - Manage cart items, apply coupons, view payment summary
+- **👤 Account Screen** - User profile, language settings, app preferences, and about section
 
 ### Technical Features
 - ✅ **Clean Architecture** - Domain, Data, Presentation layers
@@ -33,6 +39,27 @@ A professional Flutter food ordering application built with **Clean Architecture
 - ✅ **Error Handling** - Comprehensive error states with retry
 - ✅ **Cached Images** - Efficient image loading and caching
 - ✅ **Material Design 3** - Modern and beautiful UI
+- ✅ **Secure Configuration** - Environment-based API credentials with EnvConfig
+- ✅ **Network Connectivity** - NetworkInfo utility for connection checks
+- ✅ **Reusable Widgets** - Custom bottom navigation bar, nav icons, and more
+
+---
+
+## 🆕 Recent Updates
+
+### New Features Added
+- **📱 Account Page** - Full user profile screen with settings, quick actions, and about section
+- **🔐 EnvConfig** - Secure environment configuration for API credentials
+- **🌐 NetworkInfo** - Network connectivity utility for offline handling
+- **🎨 Custom Navigation Icons** - Beautiful custom-painted icons for bottom navigation
+- **📦 Base UseCase Pattern** - Abstract base class with `NoParams` for consistent use case implementation
+- **🔧 Reusable Bottom Navigation Bar** - `AppBottomNavBar` widget with cart FAB and consistent styling
+
+### Architecture Improvements
+- **Domain-first approach** - Cubits now use domain entities instead of data models
+- **Proper state management** - CartCubit properly utilizes CartUpdating state
+- **Widget extraction** - Large widgets split into smaller, reusable components
+- **Improved DI container** - Updated injection container with all new dependencies
 
 ---
 
@@ -74,23 +101,47 @@ This project follows **Clean Architecture** principles by Uncle Bob, ensuring:
 lib/
 ├── core/                           # Core functionality
 │   ├── constants/
-│   │   ├── api_constants.dart      # API endpoints & auth
-│   │   └── app_constants.dart      # App-wide constants
+│   │   ├── api_constants.dart      # API endpoints using EnvConfig
+│   │   ├── app_constants.dart      # App-wide constants
+│   │   └── env_config.dart         # 🆕 Secure environment configuration
+│   ├── cubit/
+│   │   └── language_cubit.dart     # Language state management
 │   ├── di/
-│   │   └── injection_container.dart # GetIt DI setup
+│   │   └── injection_container.dart # GetIt DI setup (updated)
 │   ├── error/
 │   │   ├── exceptions.dart         # Custom exceptions
 │   │   └── failures.dart           # Failure classes
 │   ├── l10n/
 │   │   └── app_localizations.dart  # EN/AR translations
 │   ├── network/
-│   │   └── api_client.dart         # Dio HTTP client
+│   │   ├── api_client.dart         # Dio HTTP client
+│   │   └── network_info.dart       # 🆕 Network connectivity utility
+│   ├── security/
+│   │   └── credentials.dart        # 🆕 Secure credentials handling
 │   ├── theme/
 │   │   └── app_theme.dart          # Material theme
-│   └── utils/
-│       └── guest_manager.dart      # Guest ID management
+│   ├── usecases/
+│   │   └── usecase.dart            # 🆕 Base UseCase abstract class
+│   ├── utils/
+│   │   └── guest_manager.dart      # Guest ID management
+│   └── widgets/                    # 🆕 Reusable widgets
+│       ├── app_bottom_nav_bar.dart # Custom bottom navigation
+│       ├── back_button.dart        # Reusable back button
+│       ├── blurred_divider.dart    # Decorative divider
+│       └── nav_icons/              # Custom navigation icons
+│           ├── account_nav_icon.dart
+│           ├── home_nav_icon.dart
+│           ├── menu_nav_icon.dart
+│           ├── nav_icons.dart
+│           ├── offers_nav_icon.dart
+│           └── shopping_bag_painter.dart
 │
 ├── features/                       # Feature modules
+│   ├── account/                    # 🆕 Account feature
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── account_page.dart
+│   │
 │   ├── categories/
 │   │   ├── data/
 │   │   │   ├── datasources/
@@ -144,6 +195,7 @@ lib/
 | **shared_preferences** | ^2.5.3 | Persistent storage for simple data. Used to store guest_id locally so it persists between app sessions. |
 | **intl** | ^0.20.2 | Internationalization and localization utilities. Handles date formatting, number formatting, and locale-specific strings. |
 | **flutter_localizations** | SDK | Built-in Flutter package for Material/Cupertino widget translations. Required for RTL support and localized widgets. |
+| **connectivity_plus** | latest | Network connectivity detection for offline handling. |
 
 ---
 
@@ -156,9 +208,8 @@ https://dushkaburger.com/wp-json/
 
 ### Authentication
 - **Type**: Basic Authentication
-- **Username**: `testapp`
-- **Password**: `5S0Q YjyH 4s3G elpe 5F8v u8as`
-- **Header**: `Authorization: Basic dGVzdGFwcDo1UzBRIFlqeUggNHMzRyBlbHBlIDVGOHYgdThhcw==`
+- **Configuration**: Uses `EnvConfig` for secure credential management
+- **Header**: `Authorization: Basic <encoded_credentials>`
 
 ### Endpoints
 
@@ -251,9 +302,10 @@ The app supports two languages:
 
 To switch language programmatically:
 ```dart
-MyApp.setLocale(context, Locale('ar')); // Switch to Arabic
-MyApp.setLocale(context, Locale('en')); // Switch to English
+context.read<LanguageCubit>().toggleLanguage();
 ```
+
+The language toggle is also available in the **Account Page** settings section with a beautiful animated toggle switch.
 
 ---
 
@@ -266,13 +318,15 @@ MyApp.setLocale(context, Locale('en')); // Switch to English
 - **Error States** - User-friendly error messages with retry
 - **Empty States** - Informative empty cart/categories views
 - **Animations** - Subtle transitions and micro-interactions
+- **Custom Navigation** - Beautiful bottom navigation with cart FAB
 
 ### Color Scheme
 | Color | Hex | Usage |
 |-------|-----|-------|
 | Primary | `#D32F2F` | Main buttons, accents |
 | Primary Light | `#FFCDD2` | Backgrounds, badges |
-| Background | `#F5F5F5` | Screen backgrounds |
+| Brown Primary | `#412216` | Navigation, titles |
+| Background | `#FAF6F3` | Screen backgrounds |
 | Surface | `#FFFFFF` | Cards, dialogs |
 
 ---
@@ -283,6 +337,35 @@ Run tests with:
 ```bash
 flutter test
 ```
+
+Analyze code for issues:
+```bash
+flutter analyze
+```
+
+---
+
+## 📂 Widget Library
+
+### Custom Widgets
+
+| Widget | Description |
+|--------|-------------|
+| `AppBottomNavBar` | Reusable bottom navigation bar with cart FAB |
+| `CategoryTab` | Styled category selection tab |
+| `ProductCard` | Product display card with image, name, price |
+| `BackButton` | Consistent back navigation button |
+| `BlurredDivider` | Decorative section divider |
+
+### Custom Painters
+
+| Painter | Description |
+|---------|-------------|
+| `HomeNavIcon` | Custom home icon for navigation |
+| `MenuNavIcon` | Custom menu grid icon |
+| `OffersNavIcon` | Custom offers/discount icon |
+| `AccountNavIcon` | Custom user profile icon |
+| `ShoppingBagPainter` | Custom shopping bag icon for cart FAB |
 
 ---
 
