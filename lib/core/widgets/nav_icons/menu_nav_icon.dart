@@ -11,21 +11,25 @@ class MenuNavIcon extends StatelessWidget {
     const Color darkBrown = Color(0xFF412216);
     const Color greyColor = Color(0xFF9B806E);
 
-    if (isSelected) {
-      return Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: darkBrown,
-          borderRadius: BorderRadius.circular(10),
+    // Fixed size container to prevent movement
+    return SizedBox(
+      width: 36,
+      height: 36,
+      child: Center(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: EdgeInsets.all(isSelected ? 6 : 0),
+          decoration: BoxDecoration(
+            color: isSelected ? darkBrown : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            isSelected ? Icons.menu_book_rounded : Icons.menu_book_outlined,
+            color: isSelected ? Colors.white : greyColor,
+            size: isSelected ? 20 : 24,
+          ),
         ),
-        child: const Icon(
-          Icons.menu_book_rounded,
-          color: Colors.white,
-          size: 20,
-        ),
-      );
-    }
-
-    return Icon(Icons.menu_book_outlined, color: greyColor, size: 26);
+      ),
+    );
   }
 }

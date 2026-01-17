@@ -7,14 +7,41 @@ import '../../../features/cart/presentation/pages/cart_page.dart';
 import '../../../features/account/presentation/pages/account_page.dart';
 import 'nav_icons/nav_icons.dart';
 
+/// Navigation tab indices
+abstract class NavIndex {
+  static const int home = 0;
+  static const int menu = 1;
+  static const int cart = 2;
+  static const int offers = 3;
+  static const int account = 4;
+}
+
 /// Reusable bottom navigation bar with custom icons and cart FAB
+///
+/// Usage:
+/// ```dart
+/// Scaffold(
+///   bottomNavigationBar: AppBottomNavBar(
+///     currentIndex: _currentNavIndex,
+///     onIndexChanged: (index) => setState(() => _currentNavIndex = index),
+///   ),
+/// )
+/// ```
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onIndexChanged;
 
+  // Color constants
   static const Color darkBrown = Color(0xFF412216);
   static const Color greyColor = Color(0xFF9B806E);
   static const Color linenColor = Color(0xFFFAF0E6);
+
+  // Fixed dimensions to prevent icon movement
+  static const double _navBarHeight = 85.0;
+  static const double _navItemWidth = 50.0;
+  static const double _iconSize = 24.0;
+  static const double _cartFabSize = 76.0; // Bigger cart button
+  static const double _cartFabOuterSize = 105.0; // Bigger outer ring
 
   const AppBottomNavBar({
     super.key,
@@ -29,168 +56,68 @@ class AppBottomNavBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: linenColor,
+        // Enhanced shadow at the top border
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 12,
+            spreadRadius: 0,
+            offset: const Offset(0, -4),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            spreadRadius: 0,
             offset: const Offset(0, -2),
           ),
         ],
       ),
       child: SafeArea(
-        child: Container(
-          height: 75,
-          padding: const EdgeInsets.symmetric(horizontal: 1),
+        top: false,
+        child: SizedBox(
+          height: _navBarHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Home
-              _buildNavItem(
-                context: context,
-                icon: HomeNavIcon(isSelected: currentIndex == 0),
+              _NavItem(
+                icon: HomeNavIcon(isSelected: currentIndex == NavIndex.home),
                 label: l10n.translate('home'),
-                index: 0,
+                isSelected: currentIndex == NavIndex.home,
+                onTap: () => onIndexChanged(NavIndex.home),
               ),
               // Menu
-              _buildNavItem(
-                context: context,
-                icon: MenuNavIcon(isSelected: currentIndex == 1),
+              _NavItem(
+                icon: MenuNavIcon(isSelected: currentIndex == NavIndex.menu),
                 label: l10n.translate('menu'),
-                index: 1,
+                isSelected: currentIndex == NavIndex.menu,
+                onTap: () => onIndexChanged(NavIndex.menu),
               ),
               // Cart FAB (Center)
-              _buildCartFab(context),
+              _CartFab(onTap: () => _navigateToCart(context)),
               // Offers
-              _buildNavItem(
-                context: context,
-                icon: OffersNavIcon(isSelected: currentIndex == 3),
+              _NavItem(
+                icon: OffersNavIcon(
+                  isSelected: currentIndex == NavIndex.offers,
+                ),
                 label: l10n.translate('offers'),
-                index: 3,
+                isSelected: currentIndex == NavIndex.offers,
+                onTap: () => onIndexChanged(NavIndex.offers),
               ),
               // Account
-              _buildNavItem(
-                context: context,
-                icon: AccountNavIcon(isSelected: currentIndex == 4),
+              _NavItem(
+                icon: AccountNavIcon(
+                  isSelected: currentIndex == NavIndex.account,
+                ),
                 label: l10n.translate('account'),
-                index: 4,
+                isSelected: currentIndex == NavIndex.account,
                 onTap: () => _navigateToAccount(context),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required BuildContext context,
-    required Widget icon,
-    required String label,
-    required int index,
-    VoidCallback? onTap,
-  }) {
-    final isSelected = currentIndex == index;
-    return InkWell(
-      onTap: onTap ?? () => onIndexChanged(index),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            icon,
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                color: isSelected ? darkBrown : greyColor,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCartFab(BuildContext context) {
-    return BlocBuilder<CartCubit, CartState>(
-      builder: (context, cartState) {
-        int itemCount = 0;
-        if (cartState is CartLoaded) {
-          itemCount = cartState.cart.items.length;
-        }
-
-        return Transform.translate(
-          offset: const Offset(0, -20),
-          child: GestureDetector(
-            onTap: () => _navigateToCart(context),
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: darkBrown.withValues(alpha: 0.15),
-                  width: 14,
-                ),
-              ),
-              child: Center(
-                child: Container(
-                  width: 68,
-                  height: 68,
-                  decoration: BoxDecoration(
-                    color: darkBrown,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: darkBrown.withValues(alpha: 0.25),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CustomPaint(
-                        size: const Size(32, 32),
-                        painter: ShoppingBagPainter(),
-                      ),
-                      if (itemCount > 0)
-                        Positioned(
-                          top: 4,
-                          left: 4,
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '$itemCount',
-                                style: const TextStyle(
-                                  color: darkBrown,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -205,6 +132,165 @@ class AppBottomNavBar extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AccountPage()),
+    );
+  }
+}
+
+/// Individual navigation item with fixed width to prevent movement
+class _NavItem extends StatelessWidget {
+  final Widget icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        // Fixed width prevents icons from shifting when labels change
+        width: AppBottomNavBar._navItemWidth,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Fixed size container for icon to prevent movement
+            SizedBox(
+              width: AppBottomNavBar._iconSize,
+              height: AppBottomNavBar._iconSize,
+              child: Center(child: icon),
+            ),
+            const SizedBox(height: 4),
+            // Fixed height for text to prevent layout shift
+            SizedBox(
+              height: 14,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isSelected
+                      ? AppBottomNavBar.darkBrown
+                      : AppBottomNavBar.greyColor,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Cart floating action button in the center
+class _CartFab extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _CartFab({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CartCubit, CartState>(
+      builder: (context, cartState) {
+        int itemCount = 0;
+        if (cartState is CartLoaded) {
+          itemCount = cartState.cart.items.length;
+        }
+
+        return Transform.translate(
+          offset: const Offset(0, -30), // Bigger offset for larger FAB
+          child: GestureDetector(
+            onTap: onTap,
+            child: SizedBox(
+              // Fixed outer size to prevent movement
+              width: AppBottomNavBar._cartFabOuterSize,
+              height: AppBottomNavBar._cartFabOuterSize,
+              child: Center(
+                child: Container(
+                  width: AppBottomNavBar._cartFabOuterSize,
+                  height: AppBottomNavBar._cartFabOuterSize,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppBottomNavBar.darkBrown.withValues(alpha: 0.10),
+                      width: 10, // Thicker border for bigger FAB
+                    ),
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: AppBottomNavBar._cartFabSize,
+                      height: AppBottomNavBar._cartFabSize,
+                      decoration: BoxDecoration(
+                        color: AppBottomNavBar.darkBrown,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppBottomNavBar.darkBrown.withValues(
+                              alpha: 0.40,
+                            ),
+                            blurRadius: 24, // Increased blur for softer spread
+                            spreadRadius: 8, // Wider shadow spread
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CustomPaint(
+                            size: const Size(40, 40), // Bigger icon
+                            painter: ShoppingBagPainter(),
+                          ),
+                          if (itemCount > 0)
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minWidth: 20,
+                                  minHeight: 20,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    itemCount > 99 ? '99+' : '$itemCount',
+                                    style: const TextStyle(
+                                      color: AppBottomNavBar.darkBrown,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

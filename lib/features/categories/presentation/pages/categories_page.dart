@@ -20,7 +20,7 @@ class CategoriesPage extends StatefulWidget {
 }
 
 class _CategoriesPageState extends State<CategoriesPage> {
-  int _currentNavIndex = 1;
+  int _currentNavIndex = NavIndex.menu;
 
   @override
   void initState() {

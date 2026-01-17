@@ -15,7 +15,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  int _currentNavIndex = 4; // Account tab is index 4
+  int _currentNavIndex = NavIndex.account; // Use constant for account tab
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class _AccountPageState extends State<AccountPage> {
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentNavIndex,
         onIndexChanged: (index) {
-          if (index != 4) {
+          if (index != NavIndex.account) {
             // Navigate back and let the main page handle navigation
             Navigator.pop(context);
           }

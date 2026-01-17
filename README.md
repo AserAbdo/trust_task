@@ -96,7 +96,7 @@ This project follows **Clean Architecture** principles by Uncle Bob, ensuring:
 │                      DOMAIN LAYER                            │
 │  ┌─────────────┐  ┌─────────────────┐  ┌────────────────┐   │
 │  │  Entities   │  │   Repositories  │  │   Use Cases    │   │
-│  │  (Models)   │  │   (Abstract)    │  │ (Business Logic│   │
+│  │  (Models)   │  │   (Abstract)    │  │ ( Logic )      │   │
 │  └─────────────┘  └─────────────────┘  └────────────────┘   │
 ├─────────────────────────────────────────────────────────────┤
 │                       DATA LAYER                             │
