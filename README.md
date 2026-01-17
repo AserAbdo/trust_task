@@ -12,13 +12,25 @@ A professional Flutter food ordering application built with **Clean Architecture
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="screenshots/banner.jpg" alt="Dushka Burger Banner" width="100%"/>
+  <img src="screenshots/banner.jpg" alt="Dushka Burger Banner" height="120"/>
 </p>
 
-| Home Screen | Product Details | Cart Screen | Account Screen |
-|:---:|:---:|:---:|:---:|
-| <img src="screenshots/home.png" width="200"/> | <img src="screenshots/product-details.png" width="200"/> | <img src="screenshots/cart.png" width="200"/> | <img src="screenshots/account.png" width="200"/> |
-| Browse categories and products | View details with addons | Manage your cart | User profile & settings |
+<p align="center">
+  <img src="screenshots/home.png" alt="Home Screen" width="180" height="380"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/product-details.png" alt="Product Details" width="180" height="380"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/cart.png" alt="Cart Screen" width="180" height="380"/>
+  &nbsp;&nbsp;
+  <img src="screenshots/account.png" alt="Account Screen" width="180" height="380"/>
+</p>
+
+<p align="center">
+  <b>Home Screen</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Product Details</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Cart Screen</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Account Screen</b>
+</p>
 
 ---
 
